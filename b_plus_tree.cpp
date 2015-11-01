@@ -1,5 +1,3 @@
-#include <iostream>
-#include <iomanip>
 #include "b_plus_tree.hpp"
 using namespace std;
 
@@ -29,9 +27,7 @@ Node *BPlusTree::GetAnAvailableNode() {
 }
 
 Node *BPlusTree::FindLeafNode(int value) {
-if(DEBUG)
-	cout << setw(20) << "FindLeafNode: " << setw(5) << value << endl;
-	if(root_ == -1) return NULL;
+	if(root_ == -1) return 0;
 	Node *node = GetNode(root_);
 	queue_.clear();
 	while(node->state != LEAF) {
@@ -50,8 +46,6 @@ if(DEBUG)
 }
 
 void BPlusTree::Insert(int value, int pointer) {
-if(DEBUG)
-	cout << setw(20) << "Insert: " << setw(5) << value << " " << setw(5) << pointer << endl;
 	if(root_ == -1) {
 		Node *node = GetAnAvailableNode();
 		node->state = LEAF;
@@ -86,8 +80,6 @@ if(DEBUG)
 }
 
 void BPlusTree::InsertInLeaf(Node *node, int value, int pointer) {
-if(DEBUG)
-	cout << setw(20) << "InsertInLeaf: " << setw(5) << node->num << " " << setw(5) << value << " " << setw(5) << pointer << endl;
 	if(value < node->value[0]) {
 		for(int i = node->value_num - 1; i >= 0; i--) {
 			node->value[i + 1] = node->value[i];
@@ -112,8 +104,6 @@ if(DEBUG)
 }
 
 void BPlusTree::InsertInNonleaf(Node *node, int pointer_left, int value, int pointer_right) {
-if(DEBUG)
-	cout << setw(20) << "InsertInNonleaf: " << setw(5) << node->num << " " << setw(5) << pointer_left << " " << setw(5) << value << " " << setw(5) << pointer_right << endl;
 	for(int i = 0; i <= node->value_num; i++)
 		if(node->pointer[i] == pointer_left) {
 			node->value_num++;
@@ -128,8 +118,6 @@ if(DEBUG)
 }
 
 void BPlusTree::InsertInParent(Node *node_left, int value, Node *node_right) {
-if(DEBUG)
-	cout << setw(20) << "InsertInParent: " << setw(5) << node_left->num << " " << setw(5) << value << " " << setw(5) << node_right->num << endl;
 	if(node_left->num == root_) {
 		Node *node = GetAnAvailableNode();
 		node->state = NONLEAF;
@@ -163,16 +151,12 @@ if(DEBUG)
 }
 
 void BPlusTree::Delete(int value) {
-if(DEBUG)
-	cout << setw(20) << "Delete: " << setw(5) << value << endl;
 	Node *node = FindLeafNode(value);
 	if(!node) return;
 	DeleteEntry(node, value);
 }
 
 void BPlusTree::DeleteEntry(Node *node, int value) {
-if(DEBUG)
-	cout << setw(20) << "DeleteEntry: " << setw(5) << node->num << " " << setw(5) << value << endl;
 	DeleteInNode(node, value);
 	if(node->num == root_ && node->value_num == 0) {
 		if(node->state == LEAF)
@@ -285,8 +269,6 @@ if(DEBUG)
 }
 
 void BPlusTree::DeleteInNode(Node *node, int value) {
-if(DEBUG)
-	cout << setw(20) << "DeleteInNode: " << setw(5) << node->num << " " << setw(5) << value << endl;
 	for(int i = 0; i < node->value_num; i++)
 		if(node->value[i] == value) {
 			for(int j = i; j < node->value_num - 1; j++) {
@@ -317,8 +299,6 @@ bool BPlusTree::GetSiblingAndSeperator(Node *node, int pointer, Node *&sibling_n
 }
 
 void BPlusTree::ReplaceSeperator(Node *node, int a, int b) {
-if(DEBUG)
-	cout << setw(20) << "ReplaceSeperator: " << setw(5) << node->num << " " << setw(5) << a << " " << setw(5) << b << endl;
 	for(int i = 0; i < node->value_num; i++)
 		if(node->value[i] == a) {
 			node->value[i] = b;
