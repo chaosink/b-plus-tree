@@ -1,18 +1,13 @@
-#include "b_plus_tree.hpp"
-using namespace std;
-
-#define DEBUG 1
-
 template <class T>
 BPlusTree<T>::BPlusTree() {
-	new (this) BPlusTree(DEFAULT_N);
+	new (this) BPlusTree(DEFAULT_POINTER_NUM);
 }
 
 template <class T>
 BPlusTree<T>::BPlusTree(int n) {
 	pointer_num_ = n;
 	root_ = -1;
-	swapper = new Node<T>(n + 1);
+	swapper_ = new Node<T>(n + 1);
 }
 
 template <class T>
@@ -68,17 +63,17 @@ void BPlusTree<T>::Insert(T value, int pointer) {
 	else {
 		Node<T> *node = GetAnAvailableNode();
 		node->state = LEAF;
-		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper->value[i] = leaf_node->value[i];
-		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper->pointer[i] = leaf_node->pointer[i];
-		swapper->value_num = MAX_VALUE_NUM;
-		InsertInLeaf(swapper, value, pointer);
+		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_->value[i] = leaf_node->value[i];
+		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_->pointer[i] = leaf_node->pointer[i];
+		swapper_->value_num = MAX_VALUE_NUM;
+		InsertInLeaf(swapper_, value, pointer);
 		node->pointer[LAST_POINTER] = leaf_node->pointer[LAST_POINTER];
 		leaf_node->pointer[LAST_POINTER] = node->num;
 		int mid = (pointer_num_ + 1) / 2;
-		for(int i = 0; i < mid; i++) leaf_node->value[i] = swapper->value[i];
-		for(int i = 0; i < mid; i++) leaf_node->pointer[i] = swapper->pointer[i];
-		for(int i = mid; i < pointer_num_; i++) node->value[i - mid] = swapper->value[i];
-		for(int i = mid; i < pointer_num_; i++) node->pointer[i - mid] = swapper->pointer[i];
+		for(int i = 0; i < mid; i++) leaf_node->value[i] = swapper_->value[i];
+		for(int i = 0; i < mid; i++) leaf_node->pointer[i] = swapper_->pointer[i];
+		for(int i = mid; i < pointer_num_; i++) node->value[i - mid] = swapper_->value[i];
+		for(int i = mid; i < pointer_num_; i++) node->pointer[i - mid] = swapper_->pointer[i];
 		leaf_node->value_num = mid;
 		node->value_num = pointer_num_ - mid;
 		InsertInParent(leaf_node, node->value[0], node);
@@ -144,18 +139,18 @@ void BPlusTree<T>::InsertInParent(Node<T> *node_left, T value, Node<T> *node_rig
 	else {
 		Node<T> *node = GetAnAvailableNode();
 		node->state = NONLEAF;
-		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper->value[i] = parent_node->value[i];
-		for(int i = 0; i < pointer_num_; i++) swapper->pointer[i] = parent_node->pointer[i];
-		swapper->value_num = MAX_VALUE_NUM;
-		InsertInNonleaf(swapper, node_left->num, value, node_right->num);
+		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_->value[i] = parent_node->value[i];
+		for(int i = 0; i < pointer_num_; i++) swapper_->pointer[i] = parent_node->pointer[i];
+		swapper_->value_num = MAX_VALUE_NUM;
+		InsertInNonleaf(swapper_, node_left->num, value, node_right->num);
 		int mid = (pointer_num_ + 1) / 2;
-		for(int i = 0; i < mid - 1; i++) parent_node->value[i] = swapper->value[i];
-		for(int i = 0; i < mid; i++) parent_node->pointer[i] = swapper->pointer[i];
-		for(int i = mid; i < pointer_num_; i++) node->value[i - mid] = swapper->value[i];
-		for(int i = mid; i < pointer_num_ + 1; i++) node->pointer[i - mid] = swapper->pointer[i];
-		parent_node->value_num = mid - 1;
-		node->value_num = pointer_num_ - mid;
-		InsertInParent(parent_node, swapper->value[mid - 1], node);
+		for(int i = 0; i < mid; i++) parent_node->value[i] = swapper_->value[i];
+		for(int i = 0; i < mid + 1; i++) parent_node->pointer[i] = swapper_->pointer[i];
+		for(int i = mid + 1; i < pointer_num_; i++) node->value[i - mid - 1] = swapper_->value[i];
+		for(int i = mid + 1; i < pointer_num_ + 1; i++) node->pointer[i - mid - 1] = swapper_->pointer[i];
+		parent_node->value_num = mid;
+		node->value_num = pointer_num_ - mid - 1;
+		InsertInParent(parent_node, swapper_->value[mid], node);
 	}
 }
 
