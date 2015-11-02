@@ -8,9 +8,9 @@ using namespace std;
 int main() {
 	int pointer_num = 5;
 
-	BPlusTree b_plus_tree = BPlusTree(pointer_num);
+	BPlusTree<int> b_plus_tree = BPlusTree<int>(pointer_num);
 
-	Node *node;
+	Node<int> *node;
 
 	b_plus_tree.Insert(30, 30);
 	b_plus_tree.Insert(10, 10);
