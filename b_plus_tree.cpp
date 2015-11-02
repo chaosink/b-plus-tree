@@ -158,15 +158,16 @@ void BPlusTree::Delete(int value) {
 
 void BPlusTree::DeleteEntry(Node *node, int value) {
 	DeleteInNode(node, value);
-	if(node->num == root_ && node->value_num == 0) {
-		if(node->state == LEAF)
-			root_ = -1;
-		else
-			root_ = node->pointer[0];
-		node->state = EMPTY;
+	if(node->num == root_) {
+		if(node->value_num == 0) {
+			if(node->state == LEAF)
+				root_ = -1;
+			else
+				root_ = node->pointer[0];
+			node->state = EMPTY;
+		}
 		return;
 	}
-	if(node->num == root_ && node->state == LEAF) return;
 	if(node->state == LEAF) {
 		if(node->value_num < pointer_num_ / 2) {
 			Node *sibling_node;
@@ -244,7 +245,7 @@ void BPlusTree::DeleteEntry(Node *node, int value) {
 					node->pointer[node->value_num + 1] = node->pointer[node->value_num];
 					for(int i = node->value_num; i > 0; i--) {
 						node->pointer[i] = node->pointer[i - 1];
-						node->value[i] = node->value[i];
+						node->value[i] = node->value[i - 1];
 					}
 					node->pointer[0] = sibling_node->pointer[sibling_node->value_num];
 					node->value[0] = seperator;

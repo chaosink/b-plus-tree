@@ -25,10 +25,10 @@ struct Node {
 
 class BPlusTree {
 	int pointer_num_;
-	int root_;
 	std::vector<Node *> node_;
 	Node *swapper;
 	std::vector<int> queue_;
+	int root_;
 public:
 	BPlusTree();
 	BPlusTree(int n);
