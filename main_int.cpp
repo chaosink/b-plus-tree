@@ -2,15 +2,14 @@
 #include "b_plus_tree.hpp"
 using namespace std;
 
-#define dd cout << "--------------------------------------------------";
-#define d cout << "--------------------------------------------------here" << endl;
-
 int main() {
 	int pointer_num = 5;
 
 	BPlusTree<int> b_plus_tree = BPlusTree<int>(pointer_num);
 
 	Node<int> *node;
+
+
 
 	b_plus_tree.Insert(30, 30);
 	b_plus_tree.Insert(10, 10);
@@ -44,14 +43,13 @@ int main() {
 	b_plus_tree.Insert(42, 42);
 	b_plus_tree.Insert(44, 44);
 
-//	b_plus_tree.Delete(70);
-//	b_plus_tree.Delete(91);
+
+
 	b_plus_tree.Delete(9);
 	b_plus_tree.Delete(10);
 	b_plus_tree.Delete(35);
 	b_plus_tree.Delete(37);
 	b_plus_tree.Delete(33);
-
 	b_plus_tree.Delete(43);
 	b_plus_tree.Delete(38);
 	b_plus_tree.Delete(36);
@@ -80,11 +78,12 @@ int main() {
 	b_plus_tree.Delete(80);
 	b_plus_tree.Delete(70);
 
+
+
 	node = b_plus_tree.GetNode(0);
-dd	cout << node->num << " " << node->value_num << endl;
-dd	for(int i = 0; i < pointer_num - 1; i++) cout << node->pointer[i] << " [" << node->value[i] << "] ";
+	cout << node->num << " " << node->value_num << " " << (int)node->state << endl;
+	for(int i = 0; i < pointer_num - 1; i++) cout << node->pointer[i] << " [" << node->value[i] << "] ";
 	cout << node->pointer[pointer_num - 1] << endl;
-dd	cout << (int)node->state << endl;
 
 	node = b_plus_tree.GetNode(0);
 	while(node->pointer[pointer_num - 1] != -1) {
@@ -92,6 +91,8 @@ dd	cout << (int)node->state << endl;
 		node = b_plus_tree.GetNode(node->pointer[pointer_num - 1]);
 	}
 	cout << node->num << endl;
+
+
 
 	return 0;
 }
