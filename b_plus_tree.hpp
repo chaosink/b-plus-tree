@@ -25,11 +25,11 @@ struct Node {
 
 class BPlusTree {
 	int pointer_num_;
-	int root_;
 	std::vector<Node *> node_;
 	Node *swapper;
 	std::vector<int> queue_;
 public:
+	int root_;
 	BPlusTree();
 	BPlusTree(int n);
 	Node *GetNode(int node_num);
