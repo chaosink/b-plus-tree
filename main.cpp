@@ -6,7 +6,7 @@ using namespace std;
 #define d cout << "--------------------------------------------------here" << endl;
 
 int main() {
-	BPlusTree b_plus_tree = BPlusTree();
+	BPlusTree b_plus_tree;
 	Node *node;
 
 	b_plus_tree.Insert(10, 10);
