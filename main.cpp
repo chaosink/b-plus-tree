@@ -51,6 +51,7 @@ struct Pointer {
 	bool operator==(const Pointer &pointer) {
 		return this->num == pointer.num;
 	}
+	friend ostream &operator<<(ostream& os, const Pointer &pointer);
 };
 
 ostream &operator<<(ostream& os, const Pointer &pointer) {
