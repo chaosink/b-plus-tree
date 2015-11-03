@@ -1,6 +1,5 @@
 #include "b_plus_tree.hpp"
 #include "struct.h"
-using namespace std;
 
 int main() {
 	int pointer_num = 4;
@@ -19,9 +18,9 @@ int main() {
 
 
 	node = b_plus_tree.GetNode(2);
-	cout << node->num << " " << node->value_num << " " << (int)node->state << endl;
-	for(int i = 0; i < pointer_num - 1; i++) cout << node->pointer[i] << " [" << node->value[i] << "] ";
-	cout << node->pointer[pointer_num - 1] << endl;
+	std::cout << node->num << " " << node->value_num << " " << (int)node->state << std::endl;
+	for(int i = 0; i < pointer_num - 1; i++) std::cout << node->pointer[i] << " [" << node->value[i] << "] ";
+	std::cout << node->pointer[pointer_num - 1] << std::endl;
 
 
 
@@ -34,16 +33,16 @@ int main() {
 
 
 	node = b_plus_tree.GetNode(2);
-	cout << node->num << " " << node->value_num << " " << (int)node->state << endl;
-	for(int i = 0; i < pointer_num - 1; i++) cout << node->pointer[i] << " [" << node->value[i] << "] ";
-	cout << node->pointer[pointer_num - 1] << endl;
+	std::cout << node->num << " " << node->value_num << " " << (int)node->state << std::endl;
+	for(int i = 0; i < pointer_num - 1; i++) std::cout << node->pointer[i] << " [" << node->value[i] << "] ";
+	std::cout << node->pointer[pointer_num - 1] << std::endl;
 
 	node = b_plus_tree.GetNode(0);
 	while(node->pointer[pointer_num - 1] != -1) {
-		cout << node->num << " ";
+		std::cout << node->num << " ";
 		node = b_plus_tree.GetNode(node->pointer[pointer_num - 1]);
 	}
-	cout << node->num << endl;
+	std::cout << node->num << std::endl;
 
 
 
