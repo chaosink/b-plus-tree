@@ -31,7 +31,6 @@ struct Value {
 	bool operator<=(const Value &value) {
 		return !(*this > value);
 	}
-	friend ostream &operator<<(ostream& os, const Value &value);
 };
 
 ostream &operator<<(ostream& os, const Value &value) {
