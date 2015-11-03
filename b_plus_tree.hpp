@@ -2,7 +2,6 @@
 #define B_PLUS_TREE_HPP
 
 #include <vector>
-#include <string>
 
 #define LAST_POINTER (pointer_num_ - 1)
 #define MAX_VALUE_NUM (pointer_num_ - 1)
