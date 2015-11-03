@@ -6,7 +6,6 @@ using namespace std;
 struct Value {
 	int age;
 	string name;
-
 	Value() {
 		new (this) Value(0, "");
 	}
