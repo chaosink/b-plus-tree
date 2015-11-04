@@ -26,7 +26,8 @@ struct Value {
 		return this->age == value.age && strcmp(this->name, value.name) == 0;
 	}
 	bool operator<(const Value &value) {
-		return this->age < value.age || (this->age == value.age && strcmp(this->name, value.name) < 0);
+		return this->age < value.age ||
+			(this->age == value.age && strcmp(this->name, value.name) < 0);
 	}
 };
 
@@ -83,7 +84,8 @@ Optional:
 #include "value_pointer.hpp"
 
 int main() {
-	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test"); // "test" is the name of the B+-tree file
+	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
+	// "test" is the name of the B+-tree file
 
 	b_plus_tree.Insert( <an instance of Value>, <an instance of Pointer> );
 	b_plus_tree.Find( <an instance of Value> );
