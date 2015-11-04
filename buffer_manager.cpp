@@ -1,6 +1,6 @@
 #include "buffer_manager.hpp"
 #include <fstream>
-#include <time.h>
+#include <ctime>
 using namespace std;
 
 BufferManager::BufferManager() {

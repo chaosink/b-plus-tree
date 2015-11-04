@@ -4,12 +4,14 @@
 struct Value {
 	int age;
 	char name[8];
+	float weight;
 	Value() {
-		new (this) Value(0, "");
+		new (this) Value(0, "", 0);
 	}
-	Value(int age, const char *name) {
+	Value(int age, const char *name, float weight) {
 		this->age = age;
 		strcpy(this->name, name);
+		this->weight = weight;
 	}
 	bool operator==(const Value &value) {
 		return this->age == value.age && strcmp(this->name, value.name) == 0;
@@ -32,7 +34,7 @@ struct Value {
 };
 
 std::ostream &operator<<(std::ostream& os, const Value &value) {
-	os << value.age << "-" << value.name;
+	os << value.age << "-" << value.name << "-" << value.weight;
 	return os;
 }
 

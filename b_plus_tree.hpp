@@ -51,6 +51,7 @@ public:
 	BPlusTree(std::string name);
 	~BPlusTree();
 	Node<V, P> GetNode(int node_num);
+	P Find(V value);
 	void Insert(V value, P pointer);
 	void Delete(V value);
 };

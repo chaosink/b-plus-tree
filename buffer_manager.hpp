@@ -28,7 +28,7 @@ public:
 	void Init();
 	void Init(int block_num);
 	char *GetFileBlock(std::string file_name, int file_block_num);
-	void DeleteBlock(std::string file_name);
+	void DeleteBlock(std::string file_name); // maybe useless here
 	void Terminate();
 };
 
