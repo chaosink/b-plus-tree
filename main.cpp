@@ -4,6 +4,7 @@
 int main() {
 	remove("test.info");
 	remove("test.index");
+
 	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
 
 	Node<Value, Pointer> node;
@@ -18,14 +19,14 @@ int main() {
 
 
 
-	node = b_plus_tree.GetNode(5);
+	node = b_plus_tree.GetNode(0);
 	std::cout << *(node.num) << " " << *(node.value_num) << " " << (int)*(node.state) << std::endl;
 	for(int i = 0; i < pointer_num - 1; i++) std::cout << node.pointer[i] << " [" << node.value[i] << "] ";
 	std::cout << node.pointer[pointer_num - 1] << std::endl;
 
 
 
-/*	b_plus_tree.Delete(Value(1, "0.1"));
+	b_plus_tree.Delete(Value(1, "0.1"));
 	b_plus_tree.Delete(Value(2, "0.2"));
 	b_plus_tree.Delete(Value(3, "0.3"));
 	b_plus_tree.Delete(Value(4, "0.4"));
@@ -36,7 +37,7 @@ int main() {
 	node = b_plus_tree.GetNode(0);
 	std::cout << *(node.num) << " " << *(node.value_num) << " " << (int)*(node.state) << std::endl;
 	for(int i = 0; i < pointer_num - 1; i++) std::cout << node.pointer[i] << " [" << node.value[i] << "] ";
-	std::cout << node.pointer[pointer_num - 1] << std::endl;*/
+	std::cout << node.pointer[pointer_num - 1] << std::endl;
 
 	node = b_plus_tree.GetNode(0);
 	while(node.pointer[pointer_num - 1].num != -1) {

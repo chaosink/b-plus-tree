@@ -11,10 +11,6 @@ struct Value {
 		this->age = age;
 		strcpy(this->name, name);
 	}
-	Value(const Value &value) {
-		age = value.age;
-		strcpy(name, value.name);
-	} 
 	bool operator==(const Value &value) {
 		return this->age == value.age && strcmp(this->name, value.name) == 0;
 	}

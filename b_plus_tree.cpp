@@ -44,16 +44,20 @@ Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 		if(*node.state == EMPTY) return node;
 	}
 	AddOneBlock();
-	Node<V, P> node = GetNode(node_num_);
-	*node.num = node_num_;
+	node_num_++;
+	Node<V, P> node = GetNode(node_num_ - 1);
+	*node.num = node_num_ - 1;
 	*node.state = EMPTY;
 	*node.value_num = 0;
-	node_num_++;
 	return node;
 }
 
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
+	if(node_num >= node_num_) {
+		std::cerr << "Node " << node_num << " doesn't exist!" << std::endl;
+		return Node<V, P>();
+	}
 	char *block = buffer_manager_.GetFileBlock(name_ + ".index", node_num);
 	Node<V, P> node;
 	node.num = (int *)block;
@@ -66,7 +70,7 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
-	if(root_ == -1) return *(new Node<V, P>);
+	if(root_ == -1) return Node<V, P>();
 	Node<V, P> node = GetNode(root_);
 	queue_.clear();
 	while(*node.state != LEAF) {
@@ -182,7 +186,7 @@ void BPlusTree<V, P>::InsertInParent(Node<V, P> node_left, V value, Node<V, P> n
 		for(int i = 0; i < pointer_num_; i++) swapper_.pointer[i] = parent_node.pointer[i];
 		*swapper_.value_num = MAX_VALUE_NUM;
 		InsertInNonleaf(swapper_, *node_left.num, value, *node_right.num);
-		int mid = (pointer_num_ + 1) / 2;
+		int mid = pointer_num_ / 2;
 		for(int i = 0; i < mid; i++) parent_node.value[i] = swapper_.value[i];
 		for(int i = 0; i < mid + 1; i++) parent_node.pointer[i] = swapper_.pointer[i];
 		for(int i = mid + 1; i < pointer_num_; i++) node.value[i - mid - 1] = swapper_.value[i];
@@ -196,7 +200,10 @@ void BPlusTree<V, P>::InsertInParent(Node<V, P> node_left, V value, Node<V, P> n
 template <class V, class P>
 void BPlusTree<V, P>::Delete(V value) {
 	Node<V, P> node = FindLeafNode(value);
-	if(!node.num) return; // The tree is empty. Nothing to delete.
+	if(!node.num) {
+		std::cerr <<  " The tree is empty. Nothing to delete." << std::endl;
+		return;
+	}
 	DeleteEntry(node, value);
 }
 
@@ -229,7 +236,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 					sibling_node.pointer[*sibling_node.value_num + i] = node.pointer[i];
 					sibling_node.value[*sibling_node.value_num + i] = node.value[i];
 				}
-				sibling_node.value_num += *node.value_num;
+				*sibling_node.value_num += *node.value_num;
 				sibling_node.pointer[LAST_POINTER] = node.pointer[LAST_POINTER];
 				Node<V, P> parent = GetNode(queue_.back());
 				queue_.pop_back();
