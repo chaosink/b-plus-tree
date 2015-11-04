@@ -93,7 +93,7 @@ int main() {
 }
 ```
 
-When the program terminates, two files are created.
+The program will create two files:
 * `test.info`: It records the root node number and the total node number in text format.
 * `test.index`: It records the nodes of the B+-tree in binary blocks of which each size is 4K. You can change the size of blocks by hacking the code.
 
