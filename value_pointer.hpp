@@ -1,3 +1,6 @@
+#ifndef VALUE_POINTER_HPP
+#define VALUE_POINTER_HPP
+
 #include <iostream>
 #include <string>
 
@@ -14,20 +17,8 @@ struct Value {
 	bool operator==(const Value &value) {
 		return this->age == value.age && this->name == value.name;
 	}
-	bool operator!=(const Value &value) {
-		return !(*this == value);
-	}
 	bool operator<(const Value &value) {
 		return this->age < value.age || (this->age == value.age && this->name < value.name);
-	}
-	bool operator>=(const Value &value) {
-		return !(*this < value);
-	}
-	bool operator>(const Value &value) {
-		return this->age > value.age || (this->age == value.age && this->name > value.name);
-	}
-	bool operator<=(const Value &value) {
-		return !(*this > value);
 	}
 };
 
@@ -53,3 +44,5 @@ std::ostream &operator<<(std::ostream& os, const Pointer &pointer) {
 	os << pointer.num;
 	return os;
 }
+
+#endif // VALUE_POINTER_HPP
