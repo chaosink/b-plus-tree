@@ -1,5 +1,5 @@
 #include "b_plus_tree.hpp"
-#include "struct.h"
+#include "value_pointer.hpp"
 
 int main() {
 	remove("test.info");
