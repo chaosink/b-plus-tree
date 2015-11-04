@@ -88,7 +88,7 @@ int main() {
 	// "test" is the name of the B+-tree file
 
 	b_plus_tree.Insert( <an instance of Value>, <an instance of Pointer> );
-	b_plus_tree.Find( <an instance of Value> );
+	Pointer pointer = b_plus_tree.Find( <an instance of Value> );
 	b_plus_tree.Delete( <an instance of Value> );
 }
 ```
