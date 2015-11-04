@@ -91,7 +91,7 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 template <class V, class P>
 P BPlusTree<V, P>::Find(V value) {
 	Node<V, P> node = FindLeafNode(value);
-	for(int i = 0; i < *node.num; i++)
+	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] == value)
 			return node.pointer[i];
 	return P();
