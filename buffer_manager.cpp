@@ -1,7 +1,6 @@
 #include "buffer_manager.hpp"
 #include <fstream>
 #include <ctime>
-using namespace std;
 
 BufferManager::BufferManager() {
 
@@ -23,7 +22,7 @@ void BufferManager::Init(int block_num) {
 		block_info_[i].time = MAX_TIME;
 }
 
-char *BufferManager::GetFileBlock(string file_name, int file_block_num) {
+char *BufferManager::GetFileBlock(std::string file_name, int file_block_num) {
 	for(int i = 0; i < block_num_; i++)
 		if(block_info_[i].file_name == file_name && block_info_[i].file_block_num == file_block_num)
 			return block_[i];
@@ -44,8 +43,8 @@ int BufferManager::GetAnAvailableBufferBlock() {
 	return block_num;
 }
 
-void BufferManager::ReadFileBlock(string file_name, int file_block_num, int block_num) {
-	ifstream input((file_name).c_str());
+void BufferManager::ReadFileBlock(std::string file_name, int file_block_num, int block_num) {
+	std::ifstream input((file_name).c_str());
 	input.seekg(file_block_num * BLOCK_SIZE, input.beg);
 	input.read(block_[block_num], BLOCK_SIZE);
 	input.close();
@@ -56,14 +55,14 @@ void BufferManager::ReadFileBlock(string file_name, int file_block_num, int bloc
 	block_info_[block_num].is_pined = 0;
 }
 
-void BufferManager::WriteFileBlock(string file_name, int file_block_num, int block_num) {
-	ofstream output((file_name).c_str(), ofstream::in | ofstream::out);
+void BufferManager::WriteFileBlock(std::string file_name, int file_block_num, int block_num) {
+	std::ofstream output((file_name).c_str(), std::ofstream::in | std::ofstream::out);
 	output.seekp(file_block_num * BLOCK_SIZE, output.beg);
 	output.write(block_[block_num], BLOCK_SIZE);
 	output.close();
 }
 
-void BufferManager::DeleteBlock(string file_name) {
+void BufferManager::DeleteBlock(std::string file_name) {
 	for(int i = 0; i < block_num_; i++)
 		if(block_info_[i].file_name == file_name)
 			block_info_[i].file_name.clear();
