@@ -1,30 +1,34 @@
 #include <iostream>
-#include <string>
+#include <cstring>
 
 struct Value {
 	int age;
-	std::string name;
+	char name[8];
 	Value() {
 		new (this) Value(0, "");
 	}
-	Value(int age, std::string name) {
+	Value(int age, const char *name) {
 		this->age = age;
-		this->name = name;
+		strcpy(this->name, name);
 	}
+	Value(const Value &value) {
+		age = value.age;
+		strcpy(name, value.name);
+	} 
 	bool operator==(const Value &value) {
-		return this->age == value.age && this->name == value.name;
+		return this->age == value.age && strcmp(this->name, value.name) == 0;
 	}
 	bool operator!=(const Value &value) {
 		return !(*this == value);
 	}
 	bool operator<(const Value &value) {
-		return this->age < value.age || (this->age == value.age && this->name < value.name);
+		return this->age < value.age || (this->age == value.age && strcmp(this->name, value.name) < 0);
 	}
 	bool operator>=(const Value &value) {
 		return !(*this < value);
 	}
 	bool operator>(const Value &value) {
-		return this->age > value.age || (this->age == value.age && this->name > value.name);
+		return this->age > value.age || (this->age == value.age && strcmp(this->name, value.name) > 0);
 	}
 	bool operator<=(const Value &value) {
 		return !(*this > value);
@@ -43,6 +47,9 @@ struct Pointer {
 	}
 	Pointer(int num) {
 		this->num = num;
+	}
+	static unsigned int Size() {
+		return sizeof(int);
 	}
 	bool operator==(const Pointer &pointer) {
 		return this->num == pointer.num;

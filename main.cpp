@@ -2,13 +2,13 @@
 #include "struct.h"
 
 int main() {
-	int pointer_num = 4;
+	remove("test.info");
+	remove("test.index");
+	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
 
-	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>(pointer_num);
+	Node<Value, Pointer> node;
 
-	Node<Value, Pointer> *node;
-
-
+	int pointer_num = (BLOCK_SIZE - sizeof(int) - sizeof(char) - sizeof(int) - sizeof(Pointer)) / (sizeof(Pointer) + sizeof(Value)) + 1;
 
 	b_plus_tree.Insert(Value(4, "0.4"), 4);
 	b_plus_tree.Insert(Value(1, "0.1"), 1);
@@ -18,14 +18,14 @@ int main() {
 
 
 
-	node = b_plus_tree.GetNode(0);
-	std::cout << node->num << " " << node->value_num << " " << (int)node->state << std::endl;
-	for(int i = 0; i < pointer_num - 1; i++) std::cout << node->pointer[i] << " [" << node->value[i] << "] ";
-	std::cout << node->pointer[pointer_num - 1] << std::endl;
+	node = b_plus_tree.GetNode(5);
+	std::cout << *(node.num) << " " << *(node.value_num) << " " << (int)*(node.state) << std::endl;
+	for(int i = 0; i < pointer_num - 1; i++) std::cout << node.pointer[i] << " [" << node.value[i] << "] ";
+	std::cout << node.pointer[pointer_num - 1] << std::endl;
 
 
 
-	b_plus_tree.Delete(Value(1, "0.1"));
+/*	b_plus_tree.Delete(Value(1, "0.1"));
 	b_plus_tree.Delete(Value(2, "0.2"));
 	b_plus_tree.Delete(Value(3, "0.3"));
 	b_plus_tree.Delete(Value(4, "0.4"));
@@ -34,16 +34,16 @@ int main() {
 
 
 	node = b_plus_tree.GetNode(0);
-	std::cout << node->num << " " << node->value_num << " " << (int)node->state << std::endl;
-	for(int i = 0; i < pointer_num - 1; i++) std::cout << node->pointer[i] << " [" << node->value[i] << "] ";
-	std::cout << node->pointer[pointer_num - 1] << std::endl;
+	std::cout << *(node.num) << " " << *(node.value_num) << " " << (int)*(node.state) << std::endl;
+	for(int i = 0; i < pointer_num - 1; i++) std::cout << node.pointer[i] << " [" << node.value[i] << "] ";
+	std::cout << node.pointer[pointer_num - 1] << std::endl;*/
 
 	node = b_plus_tree.GetNode(0);
-	while(node->pointer[pointer_num - 1].num != -1) {
-		std::cout << node->num << " ";
-		node = b_plus_tree.GetNode(node->pointer[pointer_num - 1].num);
+	while(node.pointer[pointer_num - 1].num != -1) {
+		std::cout << *node.num << " ";
+		node = b_plus_tree.GetNode(node.pointer[pointer_num - 1].num);
 	}
-	std::cout << node->num << std::endl;
+	std::cout << *node.num << std::endl;
 
 
 
