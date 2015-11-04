@@ -28,6 +28,6 @@
 *.app
 b_plus_tree
 
-# Index file
+# Index files
 *.index
 *.info
