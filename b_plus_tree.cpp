@@ -77,7 +77,7 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 		queue_.push_back(*node.num);
 		int i;
 		for(i = 0; i < *node.value_num; i++)
-			if(value <= node.value[i]) break;
+			if(value < node.value[i] || value == node.value[i]) break;
 		if(i == *node.value_num)
 			node = GetNode(node.pointer[i].num);
 		else if(value == node.value[i])
@@ -145,7 +145,7 @@ void BPlusTree<V, P>::InsertInLeaf(Node<V, P> node, V value, P pointer) {
 		return;
 	}
 	for(int i = *node.value_num - 1; i >= 0; i--)
-		if(value > node.value[i]) {
+		if(node.value[i] < value) {
 			for(int j = *node.value_num - 1; j >= i + 1; j--) {
 				node.value[j + 1] = node.value[j];
 				node.pointer[j + 1] = node.pointer[j];
