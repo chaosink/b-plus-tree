@@ -38,6 +38,7 @@ class BPlusTree {
 	int root_;
 	BufferManager buffer_manager_;
 	void AddOneBlock();
+	Node<V, P> GetNode(int node_num);
 	Node<V, P> GetAnAvailableNode();
 	Node<V, P> FindLeafNode(V value);
 	void InsertInLeaf(Node<V, P> node, V value, P pointer);
@@ -50,7 +51,6 @@ class BPlusTree {
 public:
 	BPlusTree(std::string name);
 	~BPlusTree();
-	Node<V, P> GetNode(int node_num);
 	P Find(V value);
 	void Insert(V value, P pointer);
 	void Delete(V value);
