@@ -1,3 +1,6 @@
+#ifndef VALUE_HPP
+#define VALUE_HPP
+
 #include <iostream>
 
 struct Value {
@@ -14,20 +17,8 @@ struct Value {
 	bool operator==(const Value &value) {
 		return this->age == value.age && this->weight == value.weight;
 	}
-	bool operator!=(const Value &value) {
-		return !(*this == value);
-	}
 	bool operator<(const Value &value) {
 		return this->age < value.age || (this->age == value.age && this->weight < value.weight);
-	}
-	bool operator>=(const Value &value) {
-		return !(*this < value);
-	}
-	bool operator>(const Value &value) {
-		return this->age > value.age || (this->age == value.age && this->weight > value.weight);
-	}
-	bool operator<=(const Value &value) {
-		return !(*this > value);
 	}
 };
 
@@ -35,3 +26,5 @@ std::ostream &operator<<(std::ostream& os, const Value &value) {
 	os << value.age << "-" << value.weight;
 	return os;
 }
+
+#endif // VALUE_HPP

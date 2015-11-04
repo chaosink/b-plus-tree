@@ -1,5 +1,5 @@
 #include "b_plus_tree.hpp"
-#include "struct.h"
+#include "value.hpp"
 
 int main() {
 	int pointer_num = 3;
