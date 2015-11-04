@@ -46,9 +46,6 @@ struct Pointer {
 	Pointer(int num) {
 		this->num = num;
 	}
-	static unsigned int Size() {
-		return sizeof(int);
-	}
 	bool operator==(const Pointer &pointer) {
 		return this->num == pointer.num;
 	}
