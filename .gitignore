@@ -27,3 +27,7 @@
 *.out
 *.app
 b_plus_tree
+
+# Index file
+*.index
+*.info

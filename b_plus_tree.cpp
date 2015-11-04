@@ -46,6 +46,15 @@ Node<T> *BPlusTree<T>::FindLeafNode(T value) {
 }
 
 template <class T>
+int BPlusTree<T>::Find(T value) {
+	Node<T> *node = FindLeafNode(value);
+	for(int i = 0; i < node->value_num; i++)
+		if(node->value[i] == value)
+			return node->pointer[i];
+	return -1;
+}
+
+template <class T>
 void BPlusTree<T>::Insert(T value, int pointer) {
 	if(root_ == -1) {
 		Node<T> *node = GetAnAvailableNode();

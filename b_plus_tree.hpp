@@ -31,21 +31,22 @@ class BPlusTree {
 	Node<T> *swapper_;
 	std::vector<int> queue_;
 	int root_;
-public:
-	BPlusTree();
-	BPlusTree(int n);
-	Node<T> *GetNode(int node_num);
 	Node<T> *GetAnAvailableNode();
 	Node<T> *FindLeafNode(T value);
-	void Insert(T value, int pointer);
 	void InsertInLeaf(Node<T> *node, T value, int pointer);
 	void InsertInNonleaf(Node<T> *node, int pointer_left, T value, int pointer_right);
 	void InsertInParent(Node<T> *node_left, T value, Node<T> *node_right);
-	void Delete(T value);
 	void DeleteEntry(Node<T> *node, T value);
 	void DeleteInNode(Node<T> *node, T value);
 	bool GetSiblingAndSeperator(Node<T> *node, int pointer, Node<T> *&sibling_node, T &seperator);
 	void ReplaceSeperator(Node<T> *node, T a, T b);
+public:
+	BPlusTree();
+	BPlusTree(int n);
+	Node<T> *GetNode(int node_num);
+	int Find(T value);
+	void Insert(T value, int pointer);
+	void Delete(T value);
 };
 
 #include "b_plus_tree.cpp"
