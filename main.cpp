@@ -2,7 +2,7 @@
 #include "struct.h"
 
 int main() {
-	int pointer_num = 4;
+	int pointer_num = 3;
 
 	BPlusTree<Value> b_plus_tree = BPlusTree<Value>(pointer_num);
 

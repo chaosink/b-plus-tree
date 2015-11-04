@@ -143,7 +143,7 @@ void BPlusTree<T>::InsertInParent(Node<T> *node_left, T value, Node<T> *node_rig
 		for(int i = 0; i < pointer_num_; i++) swapper_->pointer[i] = parent_node->pointer[i];
 		swapper_->value_num = MAX_VALUE_NUM;
 		InsertInNonleaf(swapper_, node_left->num, value, node_right->num);
-		int mid = (pointer_num_ + 1) / 2;
+		int mid = pointer_num_ / 2;
 		for(int i = 0; i < mid; i++) parent_node->value[i] = swapper_->value[i];
 		for(int i = 0; i < mid + 1; i++) parent_node->pointer[i] = swapper_->pointer[i];
 		for(int i = mid + 1; i < pointer_num_; i++) node->value[i - mid - 1] = swapper_->value[i];
