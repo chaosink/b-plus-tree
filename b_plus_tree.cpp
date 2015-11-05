@@ -5,7 +5,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 	swapper_.value_num = new int;
 	swapper_.pointer = new P[pointer_num_ + 1];
 	swapper_.value = new V[pointer_num_];
-	std::cout << pointer_num_ << std::endl;
+
 	std::ifstream ifs((name_ + ".info").c_str());
 	if(ifs.is_open()) {
 		ifs >> root_ >> node_num_ >> empty_node_num_;
