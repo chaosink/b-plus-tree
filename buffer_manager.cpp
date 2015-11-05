@@ -1,6 +1,6 @@
 #include "buffer_manager.hpp"
 #include <fstream>
-#include <ctime>
+#include <sys/time.h>
 
 BufferManager::BufferManager() {
 
@@ -19,7 +19,7 @@ void BufferManager::Init(int block_num) {
 	block_ = (char (*)[BLOCK_SIZE])new char[block_num_ * BLOCK_SIZE];
 	block_info_ = new BlockInfo[block_num_];
 	for(int i = 0; i < block_num_; i++)
-		block_info_[i].time = MAX_TIME;
+		block_info_[i].time = 0;
 }
 
 char *BufferManager::GetFileBlock(std::string file_name, int file_block_num) {
@@ -33,9 +33,9 @@ char *BufferManager::GetFileBlock(std::string file_name, int file_block_num) {
 
 int BufferManager::GetAnAvailableBufferBlock() {
 	int block_num;
-	long time = 0;
+	long time = MAX_TIME;
 	for(int i = 0; i < block_num_; i++)
-		if(block_info_[i].time > time) {
+		if(block_info_[i].time < time) {
 			time = block_info_[i].time;
 			block_num = i;
 		}
@@ -50,7 +50,9 @@ void BufferManager::ReadFileBlock(std::string file_name, int file_block_num, int
 	input.close();
 	block_info_[block_num].file_name = file_name;
 	block_info_[block_num].file_block_num = file_block_num;
-	block_info_[block_num].time = time(NULL);
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    block_info_[block_num].time = time.tv_sec * 1000000 + time.tv_usec;
 	block_info_[block_num].is_modified = 0;
 	block_info_[block_num].is_pined = 0;
 }

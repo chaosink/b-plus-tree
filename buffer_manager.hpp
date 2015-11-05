@@ -5,7 +5,7 @@
 
 #define BLOCK_SIZE 4096
 #define DEFAULT_BLOCK_NUM 10
-#define MAX_TIME 2147483647
+#define MAX_TIME 9223372036854775807
 
 struct BlockInfo {
 	std::string file_name;
