@@ -8,7 +8,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 
 	std::ifstream ifs((name_ + ".info").c_str());
 	if(ifs.is_open()) {
-		ifs >> root_ >> node_num_;
+		ifs >> root_ >> node_num_ >> empty_node_num_;
 		ifs.close();
 		return;
 	}
@@ -16,6 +16,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 
 	root_ = -1;
 	node_num_ = 0;
+	empty_node_num_ = 0;
 	std::ofstream ofs((name_ + ".index").c_str());
 	ofs.close();
 
@@ -25,7 +26,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 template <class V, class P>
 BPlusTree<V, P>::~BPlusTree() {
 	std::ofstream ofs((name_ + ".info").c_str());
-	ofs << root_ << " " << node_num_;
+	ofs << root_ << " " << node_num_ << " " << empty_node_num_;
 	ofs.close();
 	buffer_manager_.Terminate();
 }
@@ -55,10 +56,14 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
-	for(unsigned int i = 0; i < node_num_; i++) {
-		Node<V, P> node = GetNode(i);
-		if(*node.state == EMPTY) return node;
-	}
+	if(empty_node_num_)
+		for(unsigned int i = 0; i < node_num_; i++) {
+			Node<V, P> node = GetNode(i);
+			if(*node.state == EMPTY) {
+				empty_node_num_--;
+				return node;
+			}
+		}
 	AddOneBlock();
 	node_num_++;
 	Node<V, P> node = GetNode(node_num_ - 1);
@@ -251,6 +256,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				queue_.pop_back();
 				DeleteEntry(parent, seperator);
 				*node.state = EMPTY;
+				empty_node_num_++;
 				return;
 			} else {
 				if(is_predecessor) {
@@ -300,6 +306,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				queue_.pop_back();
 				DeleteEntry(parent, seperator);
 				*node.state = EMPTY;
+				empty_node_num_++;
 				return;
 			} else {
 				if(is_predecessor) {
