@@ -164,15 +164,15 @@ void BPlusTree<V, P>::InsertInLeaf(Node<V, P> node, V value, P pointer) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, P pointer_left, V value, P pointer_right) {
+void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, int pointer_left_num, V value, int pointer_right_num) {
 	for(int i = 0; i <= *node.value_num; i++)
-		if(node.pointer[i] == pointer_left) {
+		if(node.pointer[i].num == pointer_left_num) {
 			(*node.value_num)++;
 			for(int j = *node.value_num; j > i + 1; j--) {
 				node.pointer[j] = node.pointer[j - 1];
 				node.value[j - 1] = node.value[j - 2];
 			}
-			node.pointer[i + 1] = pointer_right;
+			node.pointer[i + 1].num = pointer_right_num;
 			node.value[i] = value;
 			return;
 		}

@@ -42,7 +42,7 @@ class BPlusTree {
 	Node<V, P> GetAnAvailableNode();
 	Node<V, P> FindLeafNode(V value);
 	void InsertInLeaf(Node<V, P> node, V value, P pointer);
-	void InsertInNonleaf(Node<V, P> node, P pointer_left, V value, P pointer_right);
+	void InsertInNonleaf(Node<V, P> node, int pointer_left_num, V value, int pointer_right_num);
 	void InsertInParent(Node<V, P> node_left, V value, Node<V, P> node_right);
 	void DeleteEntry(Node<V, P> node, V value);
 	void DeleteInNode(Node<V, P> node, V value);
