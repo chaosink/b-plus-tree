@@ -2,14 +2,14 @@
 #include "value_pointer.hpp"
 
 int main() {
-	remove("test.info");
-	remove("test.index");
+/*	remove("test.info");
+	remove("test.index");*/
 
 	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
 	Node<Value, Pointer> node;
 	int pointer_num = (BLOCK_SIZE - sizeof(int) - sizeof(char) - sizeof(int) - sizeof(Pointer)) / (sizeof(Pointer) + sizeof(Value)) + 1;
 
-	b_plus_tree.Insert(Value(0, "0", 0), 0);
+/*	b_plus_tree.Insert(Value(0, "0", 0), 0);
 	b_plus_tree.Insert(Value(1, "1", 0.1), 1);
 	b_plus_tree.Insert(Value(2, "2", 0.2), 2);
 	b_plus_tree.Insert(Value(3, "3", 0.3), 3);
@@ -508,7 +508,7 @@ int main() {
 	b_plus_tree.Insert(Value(496, "496", 49.6), 496);
 	b_plus_tree.Insert(Value(497, "497", 49.7), 497);
 	b_plus_tree.Insert(Value(498, "498", 49.8), 498);
-	b_plus_tree.Insert(Value(499, "499", 49.9), 499);
+	b_plus_tree.Insert(Value(499, "499", 49.9), 499);*/
 
 	Pointer pointer = b_plus_tree.Find(Value(499, "499", 49.9));
 	std::cout << pointer.num << std::endl;
