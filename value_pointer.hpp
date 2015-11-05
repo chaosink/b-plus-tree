@@ -6,7 +6,7 @@
 
 struct Value {
 	int age;
-	char name[8];
+	char name[256];
 	float weight;
 	Value() {
 		new (this) Value(0, "", 0);
