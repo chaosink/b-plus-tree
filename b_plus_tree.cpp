@@ -57,7 +57,7 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 	if(empty_node_num_)
-		for(unsigned int i = 0; i < node_num_; i++) {
+		for(int i = 0; i < node_num_; i++) {
 			Node<V, P> node = GetNode(i);
 			if(*node.state == EMPTY) {
 				std::cout << "Empty node: " << i << std::endl;
