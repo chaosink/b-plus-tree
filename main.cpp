@@ -31,5 +31,11 @@ int main() {
 	b_plus_tree.Delete(Value(4, "0.4", 0.4));
 	b_plus_tree.Delete(Value(5, "0.5", 0.5));
 
+	b_plus_tree.Insert(Value(4, "0.4", 0.4), 4);
+	b_plus_tree.Insert(Value(1, "0.1", 0.1), 1);
+	b_plus_tree.Insert(Value(5, "0.5", 0.5), 5);
+	b_plus_tree.Insert(Value(2, "0.2", 0.2), 2);
+	b_plus_tree.Insert(Value(3, "0.3", 0.3), 3);
+
 	return 0;
 }
