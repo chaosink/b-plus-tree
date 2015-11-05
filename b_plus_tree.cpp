@@ -9,16 +9,14 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 	std::ifstream ifs((name_ + ".info").c_str());
 	if(ifs.is_open()) {
 		ifs >> root_ >> node_num_ >> empty_node_num_;
-		ifs.close();
-		return;
+	} else {
+		root_ = -1;
+		node_num_ = 0;
+		empty_node_num_ = 0;
+		std::ofstream ofs((name_ + ".index").c_str());
+		ofs.close();	
 	}
 	ifs.close();
-
-	root_ = -1;
-	node_num_ = 0;
-	empty_node_num_ = 0;
-	std::ofstream ofs((name_ + ".index").c_str());
-	ofs.close();
 
 	buffer_manager_.Init();
 }
