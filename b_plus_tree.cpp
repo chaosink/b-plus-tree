@@ -14,7 +14,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 		node_num_ = 0;
 		empty_node_num_ = 0;
 		std::ofstream ofs((name_ + ".index").c_str());
-		ofs.close();	
+		ofs.close();
 	}
 	ifs.close();
 
@@ -38,7 +38,7 @@ void BPlusTree<V, P>::AddOneBlock() {
 
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
-	if(node_num >= node_num_) {
+	if(node_num >= node_num_ || node_num < 0) {
 		std::cerr << "Node " << node_num << " doesn't exist!" << std::endl;
 		return Node<V, P>();
 	}
@@ -92,13 +92,89 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 	return node;
 }
 
+
 template <class V, class P>
 P BPlusTree<V, P>::Find(V value) {
 	Node<V, P> node = FindLeafNode(value);
+	if(!node.num) return P();
 	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] == value)
 			return node.pointer[i];
 	return P();
+}
+
+template <class V, class P>
+std::vector<P> BPlusTree<V, P>::FindFrom(V value, bool contained) {
+	std::vector<P> pointer;
+	Node<V, P> node = FindLeafNode(value);
+	if(!node.num) return pointer;
+
+	for(int i = 0; i < *node.value_num; i++)
+		if(value < node.value[i] || (contained && node.value[i] == value))
+			pointer.push_back(node.pointer[i]);
+	while(node.pointer[pointer_num_ - 1].num != -1) {
+		node = GetNode(node.pointer[pointer_num_ - 1].num);
+		for(int i = 0; i < *node.value_num; i++)
+			pointer.push_back(node.pointer[i]);
+	}
+	return pointer;
+}
+
+template <class V, class P>
+std::vector<P> BPlusTree<V, P>::FindTo(V value, bool contained) {
+	std::vector<P> pointer;
+	Node<V, P> node = FindLeafNode(value);
+	if(!node.num) return pointer;
+
+	std::vector<P> pointer_temp;
+	for(int i = 0; i < *node.value_num; i++)
+		if(node.value[i] < value || (contained && node.value[i] == value))
+			pointer_temp.push_back(node.pointer[i]);
+	int node_num_to = *node.num;
+	int node_num = 0;
+	while(node_num != -1 && node_num != node_num_to) {
+		Node<V, P> node = GetNode(node_num);
+		for(int i = 0; i < *node.value_num; i++)
+			pointer.push_back(node.pointer[i]);
+		node_num = node.pointer[pointer_num_ - 1].num;
+	}
+	for(unsigned int i = 0; i < pointer_temp.size(); i++)
+		pointer.push_back(pointer_temp[i]);
+	return pointer;
+}
+
+template <class V, class P>
+std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to) {
+	std::vector<P> pointer;
+	Node<V, P> node_from = FindLeafNode(value_from);
+	Node<V, P> node_to = FindLeafNode(value_to);
+	if(!node_from.num || !node_to.num) return pointer;
+	if(value_to < value_from) return pointer;
+
+	if(*node_from.num == *node_to.num) {
+		for(int i = 0; i < *node_from.value_num; i++)
+			if((value_from < node_from.value[i] || (contained_from && node_from.value[i] == value_from)) && (node_from.value[i] < value_to || (contained_to && node_from.value[i] == value_to)))
+				pointer.push_back(node_from.pointer[i]);
+		return pointer;
+	}
+	for(int i = 0; i < *node_from.value_num; i++)
+		if(value_from < node_from.value[i] || (contained_from && node_from.value[i] == value_from))
+			pointer.push_back(node_from.pointer[i]);
+	std::vector<P> pointer_temp;
+	for(int i = 0; i < *node_to.value_num; i++)
+		if(node_to.value[i] < value_to || (contained_to && node_to.value[i] == value_to))
+			pointer_temp.push_back(node_to.pointer[i]);
+	int node_num_to = *node_to.num;
+	int node_num = node_from.pointer[pointer_num_ - 1].num;
+	while(node_num != node_num_to) {
+		Node<V, P> node = GetNode(node_num);
+		for(int i = 0; i < *node.value_num; i++)
+			pointer.push_back(node.pointer[i]);
+		node_num = node.pointer[pointer_num_ - 1].num;
+	}
+	for(unsigned int i = 0; i < pointer_temp.size(); i++)
+		pointer.push_back(pointer_temp[i]);
+	return pointer;
 }
 
 template <class V, class P>

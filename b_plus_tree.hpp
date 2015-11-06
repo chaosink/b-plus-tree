@@ -52,6 +52,9 @@ public:
 	BPlusTree(std::string name);
 	~BPlusTree();
 	P Find(V value);
+	std::vector<P> FindFrom(V value, bool contained);
+	std::vector<P> FindTo(V value, bool contained);
+	std::vector<P> FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to);
 	void Insert(V value, P pointer);
 	void Delete(V value);
 };

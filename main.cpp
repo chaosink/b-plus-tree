@@ -511,5 +511,20 @@ int main() {
 	Pointer pointer = b_plus_tree.Find(Value(496, "496", 49.6));
 	std::cout << pointer.num << std::endl;
 
+	std::vector<Pointer> p = b_plus_tree.FindFrom(Value(1, "1", 0.1), true);
+	for(unsigned int i = 0; i < p.size(); i++)
+	        std::cout << p[i].num << " ";
+	std::cout << std::endl;
+
+	p = b_plus_tree.FindTo(Value(100, "100", 10), true);
+	for(unsigned int i = 0; i < p.size(); i++)
+	        std::cout << p[i].num << " ";
+	std::cout << std::endl;
+
+	p = b_plus_tree.FindFromTo(Value(10, "10", 1), true, Value(100, "100", 10), true);
+	for(unsigned int i = 0; i < p.size(); i++)
+	        std::cout << p[i].num << " ";
+	std::cout << std::endl;
+
 	return 0;
 }
