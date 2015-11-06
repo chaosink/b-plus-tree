@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+using namespace std;
 
 #define LAST_POINTER (pointer_num_ - 1)
 #define MAX_VALUE_NUM (pointer_num_ - 1)
@@ -52,6 +53,9 @@ public:
 	~BPlusTree();
 	Node<V, P> GetNode(int node_num);
 	P Find(V value);
+	std::vector<P> FindFrom(V value, bool contained);
+	std::vector<P> FindTo(V value, bool contained);
+	std::vector<P> FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to);
 	void Insert(V value, P pointer);
 	void Delete(V value);
 };
