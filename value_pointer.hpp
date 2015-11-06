@@ -20,7 +20,8 @@ struct Value {
 		return this->age == value.age && strcmp(this->name, value.name) == 0;
 	}
 	bool operator<(const Value &value) {
-		return this->age < value.age || (this->age == value.age && strcmp(this->name, value.name) < 0);
+		return this->age < value.age ||
+			(this->age == value.age && strcmp(this->name, value.name) < 0);
 	}
 };
 

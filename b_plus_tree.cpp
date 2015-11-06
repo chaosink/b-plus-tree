@@ -55,7 +55,7 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 template <class V, class P>
 Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 	if(empty_node_num_)
-		for(unsigned int i = 0; i < node_num_; i++) {
+		for(int i = 0; i < node_num_; i++) {
 			Node<V, P> node = GetNode(i);
 			if(*node.state == EMPTY) {
 				empty_node_num_--;
@@ -237,15 +237,15 @@ void BPlusTree<V, P>::InsertInLeaf(Node<V, P> node, V value, P pointer) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, P pointer_left, V value, P pointer_right) {
+void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, int pointer_left_num, V value, int pointer_right_num) {
 	for(int i = 0; i <= *node.value_num; i++)
-		if(node.pointer[i] == pointer_left) {
+		if(node.pointer[i].num == pointer_left_num) {
 			(*node.value_num)++;
 			for(int j = *node.value_num; j > i + 1; j--) {
 				node.pointer[j] = node.pointer[j - 1];
 				node.value[j - 1] = node.value[j - 2];
 			}
-			node.pointer[i + 1] = pointer_right;
+			node.pointer[i + 1].num = pointer_right_num;
 			node.value[i] = value;
 			return;
 		}

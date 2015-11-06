@@ -519,11 +519,11 @@ int main() {
 	std::cout << node.pointer[pointer_num - 1] << std::endl;*/
 
 	node = b_plus_tree.GetNode(0);
-/*	while(node.pointer[pointer_num - 1].num != -1) {
+	while(node.pointer[pointer_num - 1].num != -1) {
 		std::cout << *node.num << " ";
 		node = b_plus_tree.GetNode(node.pointer[pointer_num - 1].num);
 	}
-	std::cout << *node.num << std::endl;*/
+	std::cout << *node.num << std::endl;
 
 	std::vector<Pointer> p = b_plus_tree.FindFrom(Value(1, "1", 0.1), true);
 	for(unsigned int i = 0; i < p.size(); i++)
