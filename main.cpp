@@ -526,5 +526,10 @@ int main() {
 	        std::cout << p[i].num << " ";
 	std::cout << std::endl;
 
+	b_plus_tree.Delete(Value(499, "499", 49.9));
+
+	pointer = b_plus_tree.Find(Value(499, "499", 49.9));
+	std::cout << pointer.num << std::endl;
+
 	return 0;
 }

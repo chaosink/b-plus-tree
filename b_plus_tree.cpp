@@ -429,10 +429,10 @@ void BPlusTree<V, P>::DeleteInNode(Node<V, P> node, V value) {
 }
 
 template <class V, class P>
-bool BPlusTree<V, P>::GetSiblingAndSeperator(Node<V, P> node, P pointer, Node<V, P> &sibling_node, V &seperator) {
+bool BPlusTree<V, P>::GetSiblingAndSeperator(Node<V, P> node, int pointer_num, Node<V, P> &sibling_node, V &seperator) {
 	int i;
 	for(i = 0; i <= *node.value_num; i++)
-		if(node.pointer[i] == pointer) break;
+		if(node.pointer[i].num == pointer_num) break;
 	if(i == *node.value_num) {
 		sibling_node = GetNode(node.pointer[i - 1].num);
 		seperator = node.value[i - 1];
