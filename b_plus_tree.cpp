@@ -304,6 +304,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 			else
 				root_ = node.pointer[0].num;
 			*node.state = EMPTY;
+			empty_node_num_++;
 		}
 		return;
 	}
