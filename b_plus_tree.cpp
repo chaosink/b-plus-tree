@@ -58,7 +58,6 @@ Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 		for(int i = 0; i < node_num_; i++) {
 			Node<V, P> node = GetNode(i);
 			if(*node.state == EMPTY) {
-				std::cout << "Empty node: " << i << std::endl;
 				empty_node_num_--;
 				return node;
 			}
