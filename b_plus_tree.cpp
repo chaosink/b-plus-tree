@@ -31,8 +31,9 @@ BPlusTree<V, P>::~BPlusTree() {
 
 template <class V, class P>
 void BPlusTree<V, P>::AddOneBlock() {
+    static char empty_block[BLOCK_SIZE] = {0};
     std::ofstream output((name_ + ".index").c_str(), std::ofstream::app | std::ofstream::binary);
-    for(int i = 0; i < BLOCK_SIZE; i++) output.write("\0", 1);
+    output.write(empty_block, BLOCK_SIZE);
     output.close();
 }
 
@@ -77,14 +78,21 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 	Node<V, P> node = GetNode(root_);
 	queue_.clear();
 	while(*node.state != LEAF) {
+		if(!*node.state) cout << "Empty node" << endl;
 		queue_.push_back(*node.num);
 		int i;
 		for(i = 0; i < *node.value_num; i++)
 			if(value < node.value[i] || value == node.value[i]) break;
 		if(i == *node.value_num)
 			node = GetNode(node.pointer[i].num);
-		else if(value == node.value[i])
+		else if(value == node.value[i]) {
+			if(node.pointer[i + 1].num == 3961) {
+				cout << *node.num << endl;
+				cout << (int)*node.state << endl;
+				cout << node_num_ << endl;	
+			}
 			node = GetNode(node.pointer[i + 1].num);
+		}
 		else
 			node = GetNode(node.pointer[i].num);
 	}
@@ -304,14 +312,16 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 			else
 				root_ = node.pointer[0].num;
 			*node.state = EMPTY;
+			empty_node_num_++;
 		}
 		return;
 	}
+	Node<V, P> parent_node = GetNode(queue_.back());
 	if(*node.state == LEAF) {
 		if(*node.value_num < pointer_num_ / 2) {
 			Node<V, P> sibling_node;
 			V seperator;
-			bool is_predecessor = GetSiblingAndSeperator(GetNode(queue_.back()), *node.num, sibling_node, seperator);
+			bool is_predecessor = GetSiblingAndSeperator(parent_node, *node.num, sibling_node, seperator);
 			if(*sibling_node.value_num + *node.value_num <= MAX_VALUE_NUM) {
 				if(!is_predecessor) {
 					Node<V, P> temp;
@@ -325,9 +335,8 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				}
 				*sibling_node.value_num += *node.value_num;
 				sibling_node.pointer[LAST_POINTER] = node.pointer[LAST_POINTER];
-				Node<V, P> parent = GetNode(queue_.back());
 				queue_.pop_back();
-				DeleteEntry(parent, seperator);
+				DeleteEntry(parent_node, seperator);
 				*node.state = EMPTY;
 				empty_node_num_++;
 				return;
@@ -341,7 +350,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 					node.value[0] = sibling_node.value[*sibling_node.value_num - 1];
 					(*node.value_num)++;
 					(*sibling_node.value_num)--;
-					ReplaceSeperator(GetNode(queue_.back()), seperator, node.value[0]); 
+					ReplaceSeperator(parent_node, seperator, node.value[0]); 
 				} else {
 					node.pointer[*node.value_num] = sibling_node.pointer[0];
 					node.value[*node.value_num] = sibling_node.value[0];
@@ -351,7 +360,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 						sibling_node.value[i] = sibling_node.value[i + 1];
 					}
 					(*sibling_node.value_num)--;
-					ReplaceSeperator(GetNode(queue_.back()), seperator, sibling_node.value[0]);
+					ReplaceSeperator(parent_node, seperator, sibling_node.value[0]);
 				}
 			}
 		}
@@ -359,7 +368,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 		if(*node.value_num < (pointer_num_ - 1) / 2) {
 			Node<V, P> sibling_node;
 			V seperator;
-			bool is_predecessor = GetSiblingAndSeperator(GetNode(queue_.back()), *node.num, sibling_node, seperator);
+			bool is_predecessor = GetSiblingAndSeperator(parent_node, *node.num, sibling_node, seperator);
 			if(*sibling_node.value_num + *node.value_num < MAX_VALUE_NUM) {
 				if(!is_predecessor) {
 					Node<V, P> temp;
@@ -375,9 +384,8 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				}
 				*sibling_node.value_num += *node.value_num;
 				sibling_node.pointer[*sibling_node.value_num] = node.pointer[*node.value_num];
-				Node<V, P> parent = GetNode(queue_.back());
 				queue_.pop_back();
-				DeleteEntry(parent, seperator);
+				DeleteEntry(parent_node, seperator);
 				*node.state = EMPTY;
 				empty_node_num_++;
 				return;
@@ -392,9 +400,9 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 					node.value[0] = seperator;
 					(*node.value_num)++;
 					(*sibling_node.value_num)--;
-					ReplaceSeperator(GetNode(queue_.back()), seperator, sibling_node.value[*sibling_node.value_num]);
+					ReplaceSeperator(parent_node, seperator, sibling_node.value[*sibling_node.value_num]);
 				} else {
-					ReplaceSeperator(GetNode(queue_.back()), seperator, sibling_node.value[0]);
+					ReplaceSeperator(parent_node, seperator, sibling_node.value[0]);
 					node.pointer[*node.value_num + 1] = sibling_node.pointer[0];
 					node.value[*node.value_num] = seperator;
 					(*node.value_num)++;
