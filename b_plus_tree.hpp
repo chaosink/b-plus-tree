@@ -46,7 +46,7 @@ class BPlusTree {
 	void InsertInParent(Node<V, P> node_left, V value, Node<V, P> node_right);
 	void DeleteEntry(Node<V, P> node, V value);
 	void DeleteInNode(Node<V, P> node, V value);
-	bool GetSiblingAndSeperator(Node<V, P> node, P pointer, Node<V, P> &sibling_node, V &seperator);
+	bool GetSiblingAndSeperator(Node<V, P> node, int pointer_num, Node<V, P> &sibling_node, V &seperator);
 	void ReplaceSeperator(Node<V, P> node, V value_old, V value_new);
 public:
 	BPlusTree(std::string name);
