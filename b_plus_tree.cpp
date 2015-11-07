@@ -92,7 +92,6 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 	return node;
 }
 
-
 template <class V, class P>
 P BPlusTree<V, P>::Find(V value) {
 	Node<V, P> node = FindLeafNode(value);
