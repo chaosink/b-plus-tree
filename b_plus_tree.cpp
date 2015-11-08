@@ -6,14 +6,14 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 	swapper_.pointer = new P[pointer_num_ + 1];
 	swapper_.value = new V[pointer_num_];
 
-	std::ifstream ifs((name_ + ".info").c_str());
+	std::ifstream ifs((name_ + ".idxinfo").c_str());
 	if(ifs.is_open()) {
 		ifs >> root_ >> node_num_ >> empty_node_num_;
 	} else {
 		root_ = -1;
 		node_num_ = 0;
 		empty_node_num_ = 0;
-		std::ofstream ofs((name_ + ".index").c_str());
+		std::ofstream ofs((name_ + ".idx").c_str());
 		ofs.close();
 	}
 	ifs.close();
@@ -23,7 +23,7 @@ BPlusTree<V, P>::BPlusTree(std::string name) {
 
 template <class V, class P>
 BPlusTree<V, P>::~BPlusTree() {
-	std::ofstream ofs((name_ + ".info").c_str());
+	std::ofstream ofs((name_ + ".idxinfo").c_str());
 	ofs << root_ << " " << node_num_ << " " << empty_node_num_;
 	ofs.close();
 	buffer_manager_.Terminate();
@@ -32,7 +32,7 @@ BPlusTree<V, P>::~BPlusTree() {
 template <class V, class P>
 void BPlusTree<V, P>::AddOneBlock() {
 	static char empty_block[BLOCK_SIZE] = {0};
-	std::ofstream output((name_ + ".index").c_str(), std::ofstream::app | std::ofstream::binary);
+	std::ofstream output((name_ + ".idx").c_str(), std::ofstream::app | std::ofstream::binary);
 	output.write(empty_block, BLOCK_SIZE);
 	output.close();
 }
@@ -43,7 +43,7 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 		std::cerr << "Node " << node_num << " doesn't exist!" << std::endl;
 		return Node<V, P>();
 	}
-	char *block = buffer_manager_.GetFileBlock(name_ + ".index", node_num);
+	char *block = buffer_manager_.GetFileBlock(name_ + ".idx", node_num);
 	Node<V, P> node;
 	node.num = (int *)block;
 	node.state = block + sizeof(int);
