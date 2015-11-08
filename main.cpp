@@ -5,8 +5,8 @@
 #define N 10000
 
 int main() {
-	remove("test.info");
-	remove("test.index");
+	remove("test.idxinfo");
+	remove("test.idx");
 
 	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
 	Pointer pointer;
