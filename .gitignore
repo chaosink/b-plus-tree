@@ -29,5 +29,5 @@
 b_plus_tree
 
 # Index files
-*.index
-*.info
+*.idx
+*.idxinfo
