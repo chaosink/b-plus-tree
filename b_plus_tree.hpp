@@ -5,7 +5,6 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-using namespace std;
 
 #define LAST_POINTER (pointer_num_ - 1)
 #define MAX_VALUE_NUM (pointer_num_ - 1)

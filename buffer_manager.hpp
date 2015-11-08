@@ -3,7 +3,7 @@
 
 #include <string>
 
-#define BLOCK_SIZE 817
+#define BLOCK_SIZE 4096
 #define DEFAULT_BLOCK_NUM 2
 #define MAX_TIME 9223372036854775807
 

@@ -1,8 +1,6 @@
 #include "buffer_manager.hpp"
 #include <fstream>
 #include <sys/time.h>
-#include <unistd.h>
-#include <iostream>
 
 BufferManager::BufferManager() {
 

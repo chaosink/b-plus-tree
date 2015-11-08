@@ -1,7 +1,8 @@
 #include "b_plus_tree.hpp"
 #include "value_pointer.hpp"
+using namespace std;
 
-#define N 100000
+#define N 10000
 
 int main() {
 	remove("test.info");
