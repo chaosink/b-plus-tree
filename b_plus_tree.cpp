@@ -78,7 +78,6 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 	Node<V, P> node = GetNode(root_);
 	queue_.clear();
 	while(*node.state != LEAF) {
-		if(!*node.state) cout << "Empty node" << endl;
 		queue_.push_back(*node.num);
 		int i;
 		for(i = 0; i < *node.value_num; i++)
@@ -87,15 +86,8 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 			node = GetNode(node.pointer[i].num);
 		else if(value == node.value[i])
 			node = GetNode(node.pointer[i + 1].num);
-		else {
-			if(node.pointer[i].num == 521) {
-				cout << value << endl;
-				cout << *node.num << endl;
-				cout << (int)*node.state << endl;
-				cout << node_num_ << endl;	
-			}
+		else
 			node = GetNode(node.pointer[i].num);
-		}
 	}
 	return node;
 }
