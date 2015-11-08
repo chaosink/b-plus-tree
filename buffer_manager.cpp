@@ -24,22 +24,35 @@ void BufferManager::Init(int block_num) {
 
 char *BufferManager::GetFileBlock(std::string file_name, int file_block_num) {
 	for(int i = 0; i < block_num_; i++)
-		if(block_info_[i].file_name == file_name && block_info_[i].file_block_num == file_block_num)
+		if(block_info_[i].file_name == file_name && block_info_[i].file_block_num == file_block_num) {
+			struct timeval time;
+			gettimeofday(&time, NULL);
+			block_info_[i].time = time.tv_sec * 1000000 + time.tv_usec;
 			return block_[i];
+		}
 	int block_num = GetAnAvailableBufferBlock();
 	ReadFileBlock(file_name, file_block_num, block_num);
 	return block_[block_num];
+}
+
+void BufferManager::Pin(char *block_address) {
+	block_info_[(block_address - (char *)block_) / BLOCK_SIZE].is_pined = 1;
+}
+
+void BufferManager::Unpin(char *block_address) {
+	block_info_[(block_address - (char *)block_) / BLOCK_SIZE].is_pined = 0;
 }
 
 int BufferManager::GetAnAvailableBufferBlock() {
 	int block_num;
 	long time = MAX_TIME;
 	for(int i = 0; i < block_num_; i++)
-		if(block_info_[i].time < time) {
+		if(!block_info_[i].is_pined && block_info_[i].time < time) {
 			time = block_info_[i].time;
 			block_num = i;
 		}
-	WriteFileBlock(block_info_[block_num].file_name, block_info_[block_num].file_block_num, block_num);
+	if(block_info_[block_num].is_modified)
+		WriteFileBlock(block_info_[block_num].file_name, block_info_[block_num].file_block_num, block_num);
 	return block_num;
 }
 
@@ -50,10 +63,10 @@ void BufferManager::ReadFileBlock(std::string file_name, int file_block_num, int
 	input.close();
 	block_info_[block_num].file_name = file_name;
 	block_info_[block_num].file_block_num = file_block_num;
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    block_info_[block_num].time = time.tv_sec * 1000000 + time.tv_usec;
-	block_info_[block_num].is_modified = 0;
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	block_info_[block_num].time = time.tv_sec * 1000000 + time.tv_usec;
+	block_info_[block_num].is_modified = 1;
 	block_info_[block_num].is_pined = 0;
 }
 
@@ -72,6 +85,6 @@ void BufferManager::DeleteBlock(std::string file_name) {
 
 void BufferManager::Terminate() {
 	for(int i = 0; i < block_num_; i++)
-		if(!block_info_[i].file_name.empty())
+		if(!block_info_[i].file_name.empty() && block_info_[i].is_modified)
 			WriteFileBlock(block_info_[i].file_name, block_info_[i].file_block_num, i);
 }
