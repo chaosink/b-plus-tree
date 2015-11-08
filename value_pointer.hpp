@@ -17,11 +17,12 @@ struct Value {
 		this->weight = weight;
 	}
 	bool operator==(const Value &value) {
-		return this->age == value.age && strcmp(this->name, value.name) == 0;
+		return this->age == value.age && strcmp(this->name, value.name) == 0 && this->weight == value.weight;
 	}
 	bool operator<(const Value &value) {
 		return this->age < value.age ||
-			(this->age == value.age && strcmp(this->name, value.name) < 0);
+			(this->age == value.age && strcmp(this->name, value.name) < 0) ||
+			(this->age == value.age && strcmp(this->name, value.name) == 0 && this->weight < value.weight);
 	}
 };
 
