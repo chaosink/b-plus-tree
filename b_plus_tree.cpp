@@ -31,10 +31,10 @@ BPlusTree<V, P>::~BPlusTree() {
 
 template <class V, class P>
 void BPlusTree<V, P>::AddOneBlock() {
-    static char empty_block[BLOCK_SIZE] = {0};
-    std::ofstream output((name_ + ".index").c_str(), std::ofstream::app | std::ofstream::binary);
-    output.write(empty_block, BLOCK_SIZE);
-    output.close();
+	static char empty_block[BLOCK_SIZE] = {0};
+	std::ofstream output((name_ + ".index").c_str(), std::ofstream::app | std::ofstream::binary);
+	output.write(empty_block, BLOCK_SIZE);
+	output.close();
 }
 
 template <class V, class P>
@@ -350,7 +350,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 					node.value[0] = sibling_node.value[*sibling_node.value_num - 1];
 					(*node.value_num)++;
 					(*sibling_node.value_num)--;
-					ReplaceSeperator(queue_.back(), seperator, node.value[0]); 
+					ReplaceSeperator(queue_.back(), seperator, node.value[0]);
 				} else {
 					node.pointer[*node.value_num] = sibling_node.pointer[0];
 					node.value[*node.value_num] = sibling_node.value[0];
