@@ -94,7 +94,7 @@ int main() {
 ```
 
 The program will create two files:
-* `test.info`: It records the root node number and the total node number in text format.
-* `test.index`: It records the nodes of the B+-tree in binary blocks of which each size is 4K. You can change the size of blocks by hacking the code.
+* `test.idxinfo`: It records the root node number and the total node number in text format.
+* `test.idx`: It records the nodes of the B+-tree in binary blocks of which each size is 4K. You can change the size of blocks by hacking the code.
 
 Acturally, the program will do operations on the existing B+-tree saved in the file of the specified name if it detects the file when starts running.
