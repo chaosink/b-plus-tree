@@ -84,7 +84,7 @@ Optional:
 #include "value_pointer.hpp"
 
 int main() {
-	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
+	BPlusTree<Value, Pointer> b_plus_tree("test");
 	// "test" is the name of the B+-tree file
 
 	b_plus_tree.Insert( <an instance of Value>, <an instance of Pointer> );

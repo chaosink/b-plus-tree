@@ -8,7 +8,7 @@ int main() {
 	remove("test.idxinfo");
 	remove("test.idx");
 
-	BPlusTree<Value, Pointer> b_plus_tree = BPlusTree<Value, Pointer>("test");
+	BPlusTree<Value, Pointer> b_plus_tree("test");
 	Pointer pointer;
 
 	for(int i = 0; i < N; i++) {
