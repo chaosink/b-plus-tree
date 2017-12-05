@@ -26,8 +26,6 @@
 *.exe
 *.out
 *.app
-b_plus_tree
 
-# Index files
-*.idx
-*.idxinfo
+# Build
+/build*

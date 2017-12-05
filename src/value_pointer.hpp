@@ -1,5 +1,4 @@
-#ifndef VALUE_POINTER_HPP
-#define VALUE_POINTER_HPP
+#pragma once
 
 #include <iostream>
 #include <cstring>
@@ -47,5 +46,3 @@ std::ostream &operator<<(std::ostream& os, const Pointer &pointer) {
 	os << pointer.num;
 	return os;
 }
-
-#endif // VALUE_POINTER_HPP

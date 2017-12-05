@@ -1,3 +1,66 @@
+#pragma once
+
+#include <fstream>
+#include <vector>
+#include <iostream>
+
+#include "buffer_manager.hpp"
+
+namespace bpt {
+
+#define LAST_POINTER (pointer_num_ - 1)
+#define MAX_VALUE_NUM (pointer_num_ - 1)
+
+template <class V, class P>
+class BPlusTree {
+	enum NodeState : unsigned char {EMPTY, NONLEAF, LEAF};
+	struct Node {
+		int *num;
+		NodeState *state;
+		int *value_num;
+		P *pointer;
+		V *value;
+		Node() {
+			num = NULL;
+			state = NULL;
+			value_num = NULL;
+			pointer = NULL;
+			value = NULL;
+		}
+	};
+
+	std::string name_;
+	int pointer_num_;
+	int node_num_;
+	int empty_node_num_;
+	Node swapper_;
+	std::vector<int> queue_;
+	int root_;
+	bm::BufferManager buffer_manager_;
+	void AddOneBlock();
+	Node GetNode(int node_num);
+	Node GetAnAvailableNode();
+	Node FindLeafNode(V value);
+	void InsertInLeaf(Node node, V value, P pointer);
+	void InsertInNonleaf(Node node, int pointer_left_num, V value, int pointer_right_num);
+	void InsertInParent(int node_left_int, V value, int node_right_num);
+	void DeleteEntry(Node node, V value);
+	void DeleteInNode(Node node, V value);
+	bool GetSiblingAndSeperator(int node_num, int pointer_num, int &sibling_node_num, V &seperator);
+	void ReplaceSeperator(int node_num, V value_old, V value_new);
+public:
+	BPlusTree(std::string name);
+	~BPlusTree();
+	P Find(V value);
+	std::vector<P> FindFrom(V value, bool contained);
+	std::vector<P> FindTo(V value, bool contained);
+	std::vector<P> FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to);
+	void Insert(V value, P pointer);
+	void Delete(V value);
+};
+
+/*********** **********/
+
 template <class V, class P>
 BPlusTree<V, P>::BPlusTree(std::string name) {
 	name_ = name;
@@ -38,15 +101,15 @@ void BPlusTree<V, P>::AddOneBlock() {
 }
 
 template <class V, class P>
-Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
+typename BPlusTree<V, P>::Node BPlusTree<V, P>::GetNode(int node_num) {
 	if(node_num >= node_num_ || node_num < 0) {
 		std::cerr << "Node " << node_num << " doesn't exist!" << std::endl;
-		return Node<V, P>();
+		return Node();
 	}
 	char *block = buffer_manager_.GetFileBlock(name_ + ".idx", node_num);
-	Node<V, P> node;
+	Node node;
 	node.num = (int *)block;
-	node.state = block + sizeof(int);
+	node.state = (BPlusTree<V, P>::NodeState*)block + sizeof(int);
 	node.value_num = (int *)(block + sizeof(int) + sizeof(char));
 	node.pointer = (P *)(block + sizeof(int) + sizeof(char) + sizeof(int));
 	node.value = (V *)(block + sizeof(int) + sizeof(char) + sizeof(int) + sizeof(P) * pointer_num_);
@@ -54,10 +117,10 @@ Node<V, P> BPlusTree<V, P>::GetNode(int node_num) {
 }
 
 template <class V, class P>
-Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
+typename BPlusTree<V, P>::Node BPlusTree<V, P>::GetAnAvailableNode() {
 	if(empty_node_num_)
 		for(int i = 0; i < node_num_; i++) {
-			Node<V, P> node = GetNode(i);
+			Node node = GetNode(i);
 			if(*node.state == EMPTY) {
 				empty_node_num_--;
 				return node;
@@ -65,7 +128,7 @@ Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 		}
 	AddOneBlock();
 	node_num_++;
-	Node<V, P> node = GetNode(node_num_ - 1);
+	Node node = GetNode(node_num_ - 1);
 	*node.num = node_num_ - 1;
 	*node.state = EMPTY;
 	*node.value_num = 0;
@@ -73,9 +136,9 @@ Node<V, P> BPlusTree<V, P>::GetAnAvailableNode() {
 }
 
 template <class V, class P>
-Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
-	if(root_ == -1) return Node<V, P>();
-	Node<V, P> node = GetNode(root_);
+typename BPlusTree<V, P>::Node BPlusTree<V, P>::FindLeafNode(V value) {
+	if(root_ == -1) return Node();
+	Node node = GetNode(root_);
 	queue_.clear();
 	while(*node.state != LEAF) {
 		queue_.push_back(*node.num);
@@ -94,7 +157,7 @@ Node<V, P> BPlusTree<V, P>::FindLeafNode(V value) {
 
 template <class V, class P>
 P BPlusTree<V, P>::Find(V value) {
-	Node<V, P> node = FindLeafNode(value);
+	Node node = FindLeafNode(value);
 	if(!node.num) return P();
 	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] == value)
@@ -105,7 +168,7 @@ P BPlusTree<V, P>::Find(V value) {
 template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindFrom(V value, bool contained) {
 	std::vector<P> pointer;
-	Node<V, P> node = FindLeafNode(value);
+	Node node = FindLeafNode(value);
 	if(!node.num) return pointer;
 
 	for(int i = 0; i < *node.value_num; i++)
@@ -122,7 +185,7 @@ std::vector<P> BPlusTree<V, P>::FindFrom(V value, bool contained) {
 template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindTo(V value, bool contained) {
 	std::vector<P> pointer;
-	Node<V, P> node = FindLeafNode(value);
+	Node node = FindLeafNode(value);
 	if(!node.num) return pointer;
 
 	std::vector<P> pointer_temp;
@@ -132,7 +195,7 @@ std::vector<P> BPlusTree<V, P>::FindTo(V value, bool contained) {
 	int node_num_to = *node.num;
 	int node_num = 0;
 	while(node_num != -1 && node_num != node_num_to) {
-		Node<V, P> node = GetNode(node_num);
+		Node node = GetNode(node_num);
 		for(int i = 0; i < *node.value_num; i++)
 			pointer.push_back(node.pointer[i]);
 		node_num = node.pointer[pointer_num_ - 1].num;
@@ -145,8 +208,8 @@ std::vector<P> BPlusTree<V, P>::FindTo(V value, bool contained) {
 template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to) {
 	std::vector<P> pointer;
-	Node<V, P> node_from = FindLeafNode(value_from);
-	Node<V, P> node_to = FindLeafNode(value_to);
+	Node node_from = FindLeafNode(value_from);
+	Node node_to = FindLeafNode(value_to);
 	if(!node_from.num || !node_to.num) return pointer;
 	if(value_to < value_from) return pointer;
 
@@ -166,7 +229,7 @@ std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V 
 	int node_num_to = *node_to.num;
 	int node_num = node_from.pointer[pointer_num_ - 1].num;
 	while(node_num != node_num_to) {
-		Node<V, P> node = GetNode(node_num);
+		Node node = GetNode(node_num);
 		for(int i = 0; i < *node.value_num; i++)
 			pointer.push_back(node.pointer[i]);
 		node_num = node.pointer[pointer_num_ - 1].num;
@@ -179,7 +242,7 @@ std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V 
 template <class V, class P>
 void BPlusTree<V, P>::Insert(V value, P pointer) {
 	if(root_ == -1) {
-		Node<V, P> node = GetAnAvailableNode();
+		Node node = GetAnAvailableNode();
 		*node.state = LEAF;
 		*node.value_num = 1;
 		node.value[0] = value;
@@ -188,12 +251,12 @@ void BPlusTree<V, P>::Insert(V value, P pointer) {
 		root_ = *node.num;
 		return;
 	}
-	Node<V, P> leaf_node = FindLeafNode(value);
+	Node leaf_node = FindLeafNode(value);
 	if(*leaf_node.value_num < MAX_VALUE_NUM)
 		InsertInLeaf(leaf_node, value, pointer);
 	else {
 		buffer_manager_.Pin((char *)leaf_node.num);
-		Node<V, P> node = GetAnAvailableNode();
+		Node node = GetAnAvailableNode();
 		buffer_manager_.Unpin((char *)leaf_node.num);
 		*node.state = LEAF;
 		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_.value[i] = leaf_node.value[i];
@@ -214,7 +277,7 @@ void BPlusTree<V, P>::Insert(V value, P pointer) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::InsertInLeaf(Node<V, P> node, V value, P pointer) {
+void BPlusTree<V, P>::InsertInLeaf(Node node, V value, P pointer) {
 	if(value < node.value[0]) {
 		for(int i = *node.value_num - 1; i >= 0; i--) {
 			node.value[i + 1] = node.value[i];
@@ -239,7 +302,7 @@ void BPlusTree<V, P>::InsertInLeaf(Node<V, P> node, V value, P pointer) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, int pointer_left_num, V value, int pointer_right_num) {
+void BPlusTree<V, P>::InsertInNonleaf(Node node, int pointer_left_num, V value, int pointer_right_num) {
 	for(int i = 0; i <= *node.value_num; i++)
 		if(node.pointer[i].num == pointer_left_num) {
 			(*node.value_num)++;
@@ -256,7 +319,7 @@ void BPlusTree<V, P>::InsertInNonleaf(Node<V, P> node, int pointer_left_num, V v
 template <class V, class P>
 void BPlusTree<V, P>::InsertInParent(int node_left_num, V value, int node_right_num) {
 	if(node_left_num == root_) {
-		Node<V, P> node = GetAnAvailableNode();
+		Node node = GetAnAvailableNode();
 		*node.state = NONLEAF;
 		*node.value_num = 1;
 		node.pointer[0].num = node_left_num;
@@ -265,13 +328,13 @@ void BPlusTree<V, P>::InsertInParent(int node_left_num, V value, int node_right_
 		root_ = *node.num;
 		return;
 	}
-	Node<V, P> parent_node = GetNode(queue_.back());
+	Node parent_node = GetNode(queue_.back());
 	queue_.pop_back();
 	if(*parent_node.value_num < MAX_VALUE_NUM)
 		InsertInNonleaf(parent_node, node_left_num, value, node_right_num);
 	else {
 		buffer_manager_.Pin((char *)parent_node.num);
-		Node<V, P> node = GetAnAvailableNode();
+		Node node = GetAnAvailableNode();
 		buffer_manager_.Unpin((char *)parent_node.num);
 		*node.state = NONLEAF;
 		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_.value[i] = parent_node.value[i];
@@ -291,7 +354,7 @@ void BPlusTree<V, P>::InsertInParent(int node_left_num, V value, int node_right_
 
 template <class V, class P>
 void BPlusTree<V, P>::Delete(V value) {
-	Node<V, P> node = FindLeafNode(value);
+	Node node = FindLeafNode(value);
 	if(!node.num) {
 		std::cerr << "The tree is empty. Nothing to delete." << std::endl;
 		return;
@@ -300,7 +363,7 @@ void BPlusTree<V, P>::Delete(V value) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
+void BPlusTree<V, P>::DeleteEntry(Node node, V value) {
 	DeleteInNode(node, value);
 	if(*node.num == root_) {
 		if(*node.value_num == 0) {
@@ -319,11 +382,11 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 			V seperator;
 			buffer_manager_.Pin((char *)node.num);
 			bool is_predecessor = GetSiblingAndSeperator(queue_.back(), *node.num, sibling_node_num, seperator);
-			Node<V, P> sibling_node = GetNode(sibling_node_num);
+			Node sibling_node = GetNode(sibling_node_num);
 			buffer_manager_.Unpin((char *)node.num);
 			if(*sibling_node.value_num + *node.value_num <= MAX_VALUE_NUM) {
 				if(!is_predecessor) {
-					Node<V, P> temp;
+					Node temp;
 					temp = node;
 					node = sibling_node;
 					sibling_node = temp;
@@ -336,7 +399,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				sibling_node.pointer[LAST_POINTER] = node.pointer[LAST_POINTER];
 				*node.state = EMPTY;
 				empty_node_num_++;
-				Node<V, P> parent_node = GetNode(queue_.back());
+				Node parent_node = GetNode(queue_.back());
 				queue_.pop_back();
 				DeleteEntry(parent_node, seperator);
 				return;
@@ -370,11 +433,11 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 			V seperator;
 			buffer_manager_.Pin((char *)node.num);
 			bool is_predecessor = GetSiblingAndSeperator(queue_.back(), *node.num, sibling_node_num, seperator);
-			Node<V, P> sibling_node = GetNode(sibling_node_num);
+			Node sibling_node = GetNode(sibling_node_num);
 			buffer_manager_.Unpin((char *)node.num);
 			if(*sibling_node.value_num + *node.value_num < MAX_VALUE_NUM) {
 				if(!is_predecessor) {
-					Node<V, P> temp;
+					Node temp;
 					temp = node;
 					node = sibling_node;
 					sibling_node = temp;
@@ -389,7 +452,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 				sibling_node.pointer[*sibling_node.value_num] = node.pointer[*node.value_num];
 				*node.state = EMPTY;
 				empty_node_num_++;
-				Node<V, P> parent_node = GetNode(queue_.back());
+				Node parent_node = GetNode(queue_.back());
 				queue_.pop_back();
 				DeleteEntry(parent_node, seperator);
 				return;
@@ -424,7 +487,7 @@ void BPlusTree<V, P>::DeleteEntry(Node<V, P> node, V value) {
 }
 
 template <class V, class P>
-void BPlusTree<V, P>::DeleteInNode(Node<V, P> node, V value) {
+void BPlusTree<V, P>::DeleteInNode(Node node, V value) {
 	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] == value) {
 			for(int j = i; j < *node.value_num - 1; j++) {
@@ -441,7 +504,7 @@ void BPlusTree<V, P>::DeleteInNode(Node<V, P> node, V value) {
 
 template <class V, class P>
 bool BPlusTree<V, P>::GetSiblingAndSeperator(int node_num, int pointer_num, int &sibling_node_num, V &seperator) {
-	Node<V, P> node = GetNode(node_num);
+	Node node = GetNode(node_num);
 	int i;
 	for(i = 0; i <= *node.value_num; i++)
 		if(node.pointer[i].num == pointer_num) break;
@@ -458,10 +521,15 @@ bool BPlusTree<V, P>::GetSiblingAndSeperator(int node_num, int pointer_num, int 
 
 template <class V, class P>
 void BPlusTree<V, P>::ReplaceSeperator(int node_num, V value_old, V value_new) {
-	Node<V, P> node = GetNode(node_num);
+	Node node = GetNode(node_num);
 	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] == value_old) {
 			node.value[i] = value_new;
 			return;
 		}
+}
+
+#undef LAST_POINTER
+#undef MAX_VALUE_NUM
+
 }

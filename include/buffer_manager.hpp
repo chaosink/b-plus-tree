@@ -1,14 +1,44 @@
-#include "buffer_manager.hpp"
+#pragma once
+
+#include <string>
 #include <fstream>
 #include <sys/time.h>
 
-BufferManager::BufferManager() {
+namespace bpt {
 
-}
+const int BLOCK_SIZE = 4096;
 
-BufferManager::~BufferManager() {
+namespace bm {
 
-}
+const int DEFAULT_BLOCK_NUM = 2;
+const long MAX_TIME = 9223372036854775807;
+
+class BufferManager {
+	struct BlockInfo {
+		std::string file_name;
+		int file_block_num;
+		long time;
+		bool is_modified;
+		bool is_pined;
+	};
+
+	int block_num_;
+	char (*block_)[BLOCK_SIZE];
+	BlockInfo *block_info_;
+	void ReadFileBlock(std::string file_name, int file_block_num, int block_num);
+	void WriteFileBlock(std::string file_name, int file_block_num, int block_num);
+	int GetAnAvailableBufferBlock();
+public:
+	void Init();
+	void Init(int block_num);
+	void Pin(char *block_address);
+	void Unpin(char *block_address);
+	char *GetFileBlock(std::string file_name, int file_block_num);
+	void DeleteBlock(std::string file_name); // maybe useless here
+	void Terminate();
+};
+
+/********** **********/
 
 void BufferManager::Init() {
 	Init(DEFAULT_BLOCK_NUM);
@@ -87,4 +117,7 @@ void BufferManager::Terminate() {
 	for(int i = 0; i < block_num_; i++)
 		if(!block_info_[i].file_name.empty() && block_info_[i].is_modified)
 			WriteFileBlock(block_info_[i].file_name, block_info_[i].file_block_num, i);
+}
+
+}
 }
