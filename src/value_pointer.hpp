@@ -4,21 +4,14 @@
 #include <cstring>
 
 struct Value {
-	int age;
-	char name[256];
-	float weight;
-	Value() {
-		new (this) Value(0, "", 0);
-	}
-	Value(int age, const char *name, float weight) {
-		this->age = age;
+	int age = 0;
+	char name[256] = "";
+	float weight = 0;
+	Value() {}
+	Value(int age, const char *name, float weight) : age(age), weight(weight) {
 		strcpy(this->name, name);
-		this->weight = weight;
 	}
-	bool operator==(const Value &value) {
-		return this->age == value.age && strcmp(this->name, value.name) == 0;
-	}
-	bool operator<(const Value &value) {
+	bool operator<(const Value &value) const { // ignore weight
 		return this->age < value.age ||
 			(this->age == value.age && strcmp(this->name, value.name) < 0);
 	}
@@ -30,15 +23,11 @@ std::ostream &operator<<(std::ostream& os, const Value &value) {
 }
 
 struct Pointer {
-	int num;
-	Pointer() {
-		new (this) Pointer(-1);
-	}
-	Pointer(int num) {
-		this->num = num;
-	}
-	bool operator==(const Pointer &pointer) {
-		return this->num == pointer.num;
+	int num = -1;
+	Pointer() {}
+	Pointer(int num) : num(num) {}
+	bool operator==(const Pointer &pointer) const {
+		return num == pointer.num;
 	}
 };
 

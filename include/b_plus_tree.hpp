@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <vector>
-#include <iostream>
 
 #include "buffer_manager.hpp"
 
@@ -40,6 +39,8 @@ class BPlusTree {
 	void AddOneBlock();
 	Node GetNode(int node_num);
 	Node GetAnAvailableNode();
+	void Pin(Node &node);
+	void Unpin(Node &node);
 	Node FindLeafNode(V value);
 	void InsertInLeaf(Node node, V value, P pointer);
 	void InsertInNonleaf(Node node, int pointer_left_num, V value, int pointer_right_num);
@@ -61,10 +62,15 @@ public:
 
 /*********** **********/
 
+template <class V>
+bool operator==(const V &v0, const V &v1) {
+	return !(v0 < v1) && !(v1 < v0);
+}
+
 template <class V, class P>
 BPlusTree<V, P>::BPlusTree(std::string name) {
 	name_ = name;
-	pointer_num_ = (BLOCK_SIZE - sizeof(int) - sizeof(char) - sizeof(int) - sizeof(P)) / (sizeof(P) + sizeof(V)) + 1;
+	pointer_num_ = (BLOCK_SIZE - sizeof(int) - sizeof(NodeState) - sizeof(int) - sizeof(P)) / (sizeof(P) + sizeof(V)) + 1;
 	swapper_.value_num = new int;
 	swapper_.pointer = new P[pointer_num_ + 1];
 	swapper_.value = new V[pointer_num_];
@@ -95,9 +101,9 @@ BPlusTree<V, P>::~BPlusTree() {
 template <class V, class P>
 void BPlusTree<V, P>::AddOneBlock() {
 	static char empty_block[BLOCK_SIZE] = {0};
-	std::ofstream output((name_ + ".idx").c_str(), std::ofstream::app | std::ofstream::binary);
-	output.write(empty_block, BLOCK_SIZE);
-	output.close();
+	std::ofstream ofs((name_ + ".idx").c_str(), std::ofstream::app | std::ofstream::binary);
+	ofs.write(empty_block, BLOCK_SIZE);
+	ofs.close();
 }
 
 template <class V, class P>
@@ -108,11 +114,11 @@ typename BPlusTree<V, P>::Node BPlusTree<V, P>::GetNode(int node_num) {
 	}
 	char *block = buffer_manager_.GetFileBlock(name_ + ".idx", node_num);
 	Node node;
-	node.num = (int *)block;
+	node.num = (int*)block;
 	node.state = (BPlusTree<V, P>::NodeState*)block + sizeof(int);
-	node.value_num = (int *)(block + sizeof(int) + sizeof(char));
-	node.pointer = (P *)(block + sizeof(int) + sizeof(char) + sizeof(int));
-	node.value = (V *)(block + sizeof(int) + sizeof(char) + sizeof(int) + sizeof(P) * pointer_num_);
+	node.value_num = (int*)(block + sizeof(int) + sizeof(char));
+	node.pointer = (P*)(block + sizeof(int) + sizeof(char) + sizeof(int));
+	node.value = (V*)(block + sizeof(int) + sizeof(char) + sizeof(int) + sizeof(P) * pointer_num_);
 	return node;
 }
 
@@ -133,6 +139,16 @@ typename BPlusTree<V, P>::Node BPlusTree<V, P>::GetAnAvailableNode() {
 	*node.state = EMPTY;
 	*node.value_num = 0;
 	return node;
+}
+
+template <class V, class P>
+void BPlusTree<V, P>::Pin(Node &node) {
+	buffer_manager_.Pin((char*)node.num);
+}
+
+template <class V, class P>
+void BPlusTree<V, P>::Unpin(Node &node) {
+	buffer_manager_.Unpin((char*)node.num);
 }
 
 template <class V, class P>
@@ -169,55 +185,57 @@ template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindFrom(V value, bool contained) {
 	std::vector<P> pointer;
 	Node node = FindLeafNode(value);
-	if(!node.num) return pointer;
+	if(!node.num) return std::move(pointer);
 
 	for(int i = 0; i < *node.value_num; i++)
 		if(value < node.value[i] || (contained && node.value[i] == value))
 			pointer.push_back(node.pointer[i]);
-	while(node.pointer[pointer_num_ - 1].num != -1) {
-		node = GetNode(node.pointer[pointer_num_ - 1].num);
+	while(node.pointer[LAST_POINTER].num != -1) {
+		node = GetNode(node.pointer[LAST_POINTER].num);
 		for(int i = 0; i < *node.value_num; i++)
 			pointer.push_back(node.pointer[i]);
 	}
-	return pointer;
+	return std::move(pointer);
 }
 
 template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindTo(V value, bool contained) {
 	std::vector<P> pointer;
 	Node node = FindLeafNode(value);
-	if(!node.num) return pointer;
+	if(!node.num) return std::move(pointer);
 
 	std::vector<P> pointer_temp;
 	for(int i = 0; i < *node.value_num; i++)
 		if(node.value[i] < value || (contained && node.value[i] == value))
 			pointer_temp.push_back(node.pointer[i]);
 	int node_num_to = *node.num;
+	if(node_num_to == 0) return std::move(pointer_temp);
 	int node_num = 0;
 	while(node_num != -1 && node_num != node_num_to) {
 		Node node = GetNode(node_num);
 		for(int i = 0; i < *node.value_num; i++)
 			pointer.push_back(node.pointer[i]);
-		node_num = node.pointer[pointer_num_ - 1].num;
+		node_num = node.pointer[LAST_POINTER].num;
 	}
-	for(unsigned int i = 0; i < pointer_temp.size(); i++)
-		pointer.push_back(pointer_temp[i]);
-	return pointer;
+	pointer.insert(pointer.end(), pointer_temp.begin(), pointer_temp.end());
+	return std::move(pointer);
 }
 
 template <class V, class P>
 std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V value_to, bool contained_to) {
 	std::vector<P> pointer;
+	if(value_to < value_from) return std::move(pointer);
 	Node node_from = FindLeafNode(value_from);
+	Pin(node_from);
 	Node node_to = FindLeafNode(value_to);
-	if(!node_from.num || !node_to.num) return pointer;
-	if(value_to < value_from) return pointer;
+	Unpin(node_from);
+	if(!node_from.num || !node_to.num) return std::move(pointer);
 
 	if(*node_from.num == *node_to.num) {
 		for(int i = 0; i < *node_from.value_num; i++)
 			if((value_from < node_from.value[i] || (contained_from && node_from.value[i] == value_from)) && (node_from.value[i] < value_to || (contained_to && node_from.value[i] == value_to)))
 				pointer.push_back(node_from.pointer[i]);
-		return pointer;
+		return std::move(pointer);
 	}
 	for(int i = 0; i < *node_from.value_num; i++)
 		if(value_from < node_from.value[i] || (contained_from && node_from.value[i] == value_from))
@@ -227,16 +245,16 @@ std::vector<P> BPlusTree<V, P>::FindFromTo(V value_from, bool contained_from, V 
 		if(node_to.value[i] < value_to || (contained_to && node_to.value[i] == value_to))
 			pointer_temp.push_back(node_to.pointer[i]);
 	int node_num_to = *node_to.num;
-	int node_num = node_from.pointer[pointer_num_ - 1].num;
+	int node_num = node_from.pointer[LAST_POINTER].num;
 	while(node_num != node_num_to) {
 		Node node = GetNode(node_num);
 		for(int i = 0; i < *node.value_num; i++)
 			pointer.push_back(node.pointer[i]);
-		node_num = node.pointer[pointer_num_ - 1].num;
+		node_num = node.pointer[LAST_POINTER].num;
 	}
 	for(unsigned int i = 0; i < pointer_temp.size(); i++)
 		pointer.push_back(pointer_temp[i]);
-	return pointer;
+	return std::move(pointer);
 }
 
 template <class V, class P>
@@ -255,9 +273,9 @@ void BPlusTree<V, P>::Insert(V value, P pointer) {
 	if(*leaf_node.value_num < MAX_VALUE_NUM)
 		InsertInLeaf(leaf_node, value, pointer);
 	else {
-		buffer_manager_.Pin((char *)leaf_node.num);
+		Pin(leaf_node);
 		Node node = GetAnAvailableNode();
-		buffer_manager_.Unpin((char *)leaf_node.num);
+		Unpin(leaf_node);
 		*node.state = LEAF;
 		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_.value[i] = leaf_node.value[i];
 		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_.pointer[i] = leaf_node.pointer[i];
@@ -333,9 +351,9 @@ void BPlusTree<V, P>::InsertInParent(int node_left_num, V value, int node_right_
 	if(*parent_node.value_num < MAX_VALUE_NUM)
 		InsertInNonleaf(parent_node, node_left_num, value, node_right_num);
 	else {
-		buffer_manager_.Pin((char *)parent_node.num);
+		Pin(parent_node);
 		Node node = GetAnAvailableNode();
-		buffer_manager_.Unpin((char *)parent_node.num);
+		Unpin(parent_node);
 		*node.state = NONLEAF;
 		for(int i = 0; i < MAX_VALUE_NUM; i++) swapper_.value[i] = parent_node.value[i];
 		for(int i = 0; i < pointer_num_; i++) swapper_.pointer[i] = parent_node.pointer[i];
@@ -380,10 +398,10 @@ void BPlusTree<V, P>::DeleteEntry(Node node, V value) {
 		if(*node.value_num < pointer_num_ / 2) {
 			int sibling_node_num;
 			V seperator;
-			buffer_manager_.Pin((char *)node.num);
+			Pin(node);
 			bool is_predecessor = GetSiblingAndSeperator(queue_.back(), *node.num, sibling_node_num, seperator);
 			Node sibling_node = GetNode(sibling_node_num);
-			buffer_manager_.Unpin((char *)node.num);
+			Unpin(node);
 			if(*sibling_node.value_num + *node.value_num <= MAX_VALUE_NUM) {
 				if(!is_predecessor) {
 					Node temp;
@@ -428,13 +446,13 @@ void BPlusTree<V, P>::DeleteEntry(Node node, V value) {
 			}
 		}
 	} else if(*node.state == NONLEAF) {
-		if(*node.value_num < (pointer_num_ - 1) / 2) {
+		if(*node.value_num < MAX_VALUE_NUM / 2) {
 			int sibling_node_num;
 			V seperator;
-			buffer_manager_.Pin((char *)node.num);
+			Pin(node);
 			bool is_predecessor = GetSiblingAndSeperator(queue_.back(), *node.num, sibling_node_num, seperator);
 			Node sibling_node = GetNode(sibling_node_num);
-			buffer_manager_.Unpin((char *)node.num);
+			Unpin(node);
 			if(*sibling_node.value_num + *node.value_num < MAX_VALUE_NUM) {
 				if(!is_predecessor) {
 					Node temp;
