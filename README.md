@@ -1,6 +1,6 @@
 # b-plus-tree
 
-A highly reusable implementation of B+-tree with which you can use your own definition of `Value` and `Pointer` and also you can save the B+-tree in file blocks to reuse it later.
+A header only and highly reusable implementation of B+-tree with which you can use your own definition of `Value` and `Pointer` and also you can save the B+-tree in file blocks to reuse it later.
 
 ## Define your own Pointer and Value
 
