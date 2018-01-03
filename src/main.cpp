@@ -4,8 +4,6 @@ using namespace std;
 #include "b_plus_tree.hpp"
 #include "value_pointer.hpp"
 
-const int N = 10000;
-
 int main() {
 	remove("test.idxinfo");
 	remove("test.idx");
@@ -14,6 +12,8 @@ int main() {
 	Pointer pointer;
 	vector<Pointer> p;
 
+	// 10000 Values
+	const int N = 10000;
 	for(int i = 0; i < N; i++) {
 		char buffer[256];
 		sprintf(buffer, "%d", i);
@@ -28,25 +28,29 @@ int main() {
 	pointer = b_plus_tree.Find(Value(16, "17", 0.f));
 	cout << pointer.num << endl;
 
-	// find from an existing Value, the Pointers with Value satisfying > or >= returned
+	// find from an existing Value, the Pointers with Value satisfying >= returned
+	// true means >=, false means >
 	p = b_plus_tree.FindFrom(Value(9995, "9995", 0.f), true);
 	for(unsigned int i = 0; i < p.size(); i++)
 		cout << p[i] << " ";
 	cout << endl;
 
-	// find from a non-existing Value, the Pointers with Value satisfying > or >= returned
+	// find from a non-existing Value, the Pointers with Value satisfying >= returned
+	// true means >=, false means >
 	p = b_plus_tree.FindFrom(Value(9995, "9996", 0.f), true);
 	for(unsigned int i = 0; i < p.size(); i++)
 		cout << p[i] << " ";
 	cout << endl;
 
-	// find to an existing Value, the Pointers with Value satisfying < or <= returned
+	// find to an existing Value, the Pointers with Value satisfying <= returned
+	// true means <=, false means <
 	p = b_plus_tree.FindTo(Value(4, "4", 0.f), true);
 	for(unsigned int i = 0; i < p.size(); i++)
 		cout << p[i] << " ";
 	cout << endl;
 
-	// find to a non-existing Value, the Pointers with Value satisfying < or <= returned
+	// find to a non-existing Value, the Pointers with Value satisfying <= returned
+	// true means <=, false means <
 	p = b_plus_tree.FindTo(Value(4, "3", 0.f), true);
 	for(unsigned int i = 0; i < p.size(); i++)
 		cout << p[i] << " ";
