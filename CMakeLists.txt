@@ -15,5 +15,5 @@ include_directories(
 )
 
 add_executable(b_plus_tree_test
-	src/main.cpp
+	src/b_plus_tree_test.cpp
 )
