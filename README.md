@@ -1,10 +1,10 @@
 # b-plus-tree
 
-A header only and highly reusable implementation of B+-tree with which you can use your own definition of `Value` and `Pointer` and also you can save the B+-tree in file blocks to reuse it later.
+A header-only and highly reusable implementation of B+-tree with which you can use your own definition of `Value` and `Pointer` and also the B+-tree can be saved in file blocks to be reused later.
 
-## Define your own Pointer and Value
+## Define your own `Value` and `Pointer`
 
-#### You can define your own Value like this:
+#### You can define your own `Value` like this:
 
 ```cpp
 #include <cstring>
@@ -25,7 +25,6 @@ struct Value {
 ```
 
 Necessary:
-* Member variables occupying memory space.
 * A default constructor without arguments.
 * Overload of comparison operator `<`.
 
@@ -43,11 +42,11 @@ struct Pointer {
 ```
 
 Necessary:
-* Member variables occupying memory space. A member variable named `num` with type `int` must be defined to reccord block numbers.
+* A member variable named `num` with type `int` to reccord the block numbers.
 * A default constructor without arguments.
 * Overload of comparison operator `==`.
 
-## Build B+-tree with your own Value and Pointer
+## Build B+-tree with your own `Value` and `Pointer`
 
 ```cpp
 #include "b_plus_tree.hpp"
@@ -64,7 +63,7 @@ int main() {
 ```
 
 The program will create two files:
-* `test.idxinfo`: It records the root node number and the total node number in text format.
+* `test.idxinfo`: It records the root node number and the total node number in plain text.
 * `test.idx`: It records the nodes of the B+-tree in binary blocks of which each size is 4K. You can change the size of blocks by hacking the code.
 
-Acturally, the program will do operations on the existing B+-tree saved in the file of the specified name if it detects the file when starts running.
+Acturally, the program will do operations on the **existing B+-tree** saved in the file with the specified name if it detects the file when starts running.
